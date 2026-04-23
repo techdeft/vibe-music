@@ -58,14 +58,16 @@ class Vibe_Admin {
 
     public function enqueue_admin_scripts( $hook ) {
         // Load on VIBE admin pages and CPT edit pages
-        $vibe_hooks = [ 'toplevel_page_vibe-music', 'vibe-music_page_vibe-genres', 'vibe-music_page_vibe-settings' ];
+        $vibe_hooks = [ 
+            'toplevel_page_vibe-music', 
+            'vibe-music_page_vibe-studio', 
+            'vibe-music_page_vibe-genres', 
+            'vibe-music_page_vibe-settings' 
+        ];
         $cpt_hooks  = [ 'post.php', 'post-new.php' ];
 
         if ( in_array( $hook, $vibe_hooks ) || ( in_array( $hook, $cpt_hooks ) && in_array( get_post_type(), [ 'vibe_artist', 'vibe_album', 'vibe_track' ] ) ) ) {
             wp_enqueue_media();
-        }
-
-        if ( in_array( $hook, $vibe_hooks ) ) {
             wp_enqueue_style( 'vibe-admin', VIBE_PLUGIN_URL . 'assets/css/admin.css', [], VIBE_VERSION );
         }
     }

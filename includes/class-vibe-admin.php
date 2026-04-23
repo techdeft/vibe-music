@@ -453,63 +453,68 @@ class Vibe_Admin {
     public function genres_page() {
         $genres = get_terms( [ 'taxonomy' => 'vibe_genre', 'hide_empty' => false ] );
         ?>
-        <div class="wrap vibe-admin-wrap">
-            <div class="vibe-admin-header">
-                <h1>Genres</h1>
+        <div class="vibe-admin-wrap">
+            <div class="vibe-hero">
+                <div class="vibe-hero-content">
+                    <h1>Genres</h1>
+                    <p>Organize your music library with custom genres and categories.</p>
+                </div>
             </div>
 
-            <div class="vibe-two-col">
-                <!-- Add Genre Form -->
-                <div class="vibe-card">
-                    <h2>Add New Genre</h2>
-                    <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-                        <?php wp_nonce_field( 'vibe_save_genre', 'vibe_genre_nonce' ); ?>
-                        <input type="hidden" name="action" value="vibe_save_genre" />
-                        <div class="vibe-form-group">
-                            <label for="genre_name">Genre Name</label>
-                            <input type="text" id="genre_name" name="genre_name" required class="regular-text" placeholder="e.g. Hip-Hop, Jazz, Electronic..." />
-                        </div>
-                        <div class="vibe-form-group">
-                            <label for="genre_slug">Slug (optional)</label>
-                            <input type="text" id="genre_slug" name="genre_slug" class="regular-text" placeholder="auto-generated if left blank" />
-                        </div>
-                        <div class="vibe-form-group">
-                            <label for="genre_description">Description</label>
-                            <textarea id="genre_description" name="genre_description" rows="3" class="large-text"></textarea>
-                        </div>
-                        <button type="submit" class="vibe-btn vibe-btn-primary">Add Genre</button>
-                    </form>
-                </div>
+            <div class="vibe-canvas">
+                <div class="vibe-two-col">
+                    <!-- Add Genre Form -->
+                    <div class="vibe-card">
+                        <h2><span class="dashicons dashicons-plus"></span> Add New Genre</h2>
+                        <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+                            <?php wp_nonce_field( 'vibe_save_genre', 'vibe_genre_nonce' ); ?>
+                            <input type="hidden" name="action" value="vibe_save_genre" />
+                            <div class="vibe-form-group">
+                                <label for="genre_name">Genre Name</label>
+                                <input type="text" id="genre_name" name="genre_name" required class="regular-text" placeholder="e.g. Hip-Hop, Jazz, Electronic..." />
+                            </div>
+                            <div class="vibe-form-group">
+                                <label for="genre_slug">Slug (optional)</label>
+                                <input type="text" id="genre_slug" name="genre_slug" class="regular-text" placeholder="auto-generated if left blank" />
+                            </div>
+                            <button type="submit" class="vibe-btn vibe-btn-primary">Create Genre</button>
+                        </form>
+                    </div>
 
-                <!-- Genres List -->
-                <div class="vibe-card">
-                    <h2>All Genres</h2>
-                    <table class="vibe-table">
-                        <thead>
-                            <tr><th>Name</th><th>Slug</th><th>Tracks</th><th>Actions</th></tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ( $genres as $genre ) : ?>
-                            <tr>
-                                <td><strong><?php echo esc_html( $genre->name ); ?></strong></td>
-                                <td><code><?php echo esc_html( $genre->slug ); ?></code></td>
-                                <td><?php echo esc_html( $genre->count ); ?></td>
-                                <td>
-                                    <a href="<?php echo esc_url( admin_url( 'edit-tags.php?action=edit&taxonomy=vibe_genre&tag_ID=' . $genre->term_id ) ); ?>" class="vibe-action-link">Edit</a>
-                                    <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline;">
-                                        <?php wp_nonce_field( 'vibe_delete_genre_' . $genre->term_id, 'vibe_delete_nonce' ); ?>
-                                        <input type="hidden" name="action" value="vibe_delete_genre" />
-                                        <input type="hidden" name="term_id" value="<?php echo esc_attr( $genre->term_id ); ?>" />
-                                        <button type="submit" class="vibe-action-link vibe-action-link--danger" onclick="return confirm('Delete this genre?')">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                            <?php if ( empty( $genres ) ) : ?>
-                            <tr><td colspan="4" class="vibe-empty-state">No genres yet.</td></tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
+                    <!-- Genre List -->
+                    <div class="vibe-card">
+                        <h2><span class="dashicons dashicons-category"></span> Existing Genres</h2>
+                        <table class="vibe-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Slug</th>
+                                    <th>Count</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ( $genres as $genre ) : ?>
+                                <tr>
+                                    <td><strong><?php echo esc_html( $genre->name ); ?></strong></td>
+                                    <td><code><?php echo esc_html( $genre->slug ); ?></code></td>
+                                    <td><?php echo esc_html( $genre->count ); ?></td>
+                                    <td>
+                                        <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline;">
+                                            <?php wp_nonce_field( 'vibe_delete_genre_' . $genre->term_id, 'vibe_delete_nonce' ); ?>
+                                            <input type="hidden" name="action" value="vibe_delete_genre" />
+                                            <input type="hidden" name="term_id" value="<?php echo esc_attr( $genre->term_id ); ?>" />
+                                            <button type="submit" class="vibe-action-link vibe-action-link--danger" onclick="return confirm('Delete this genre?')">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                                <?php if ( empty( $genres ) ) : ?>
+                                <tr><td colspan="4" class="vibe-empty-state">No genres yet.</td></tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -528,64 +533,67 @@ class Vibe_Admin {
         $allow_reg   = get_option( 'vibe_allow_registration', '0' );
         $saved       = isset( $_GET['saved'] ) && $_GET['saved'] === '1';
         ?>
-        <div class="wrap vibe-admin-wrap">
-            <div class="vibe-admin-header">
-                <h1>Settings</h1>
+        <div class="vibe-admin-wrap">
+            <div class="vibe-hero">
+                <div class="vibe-hero-content">
+                    <h1>Settings</h1>
+                    <p>Configure your player slug, branding, and user registration settings.</p>
+                </div>
             </div>
 
-            <?php if ( $saved ) : ?>
-            <div class="notice notice-success is-dismissible"><p>✅ Settings saved successfully!</p></div>
-            <?php endif; ?>
+            <div class="vibe-canvas">
+                <?php if ( $saved ) : ?>
+                    <div class="notice notice-success is-dismissible" style="margin-bottom: 40px;"><p>✅ Settings updated successfully!</p></div>
+                <?php endif; ?>
 
-            <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-                <?php wp_nonce_field( 'vibe_save_settings', 'vibe_settings_nonce' ); ?>
-                <input type="hidden" name="action" value="vibe_save_settings" />
+                <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+                    <?php wp_nonce_field( 'vibe_save_settings', 'vibe_settings_nonce' ); ?>
+                    <input type="hidden" name="action" value="vibe_save_settings" />
 
-                <div class="vibe-settings-grid">
-                    <!-- Frontend Settings -->
-                    <div class="vibe-card">
-                        <h2>🎵 Frontend Configuration</h2>
-                        <div class="vibe-form-group">
-                            <label for="vibe_slug"><strong>Player Slug</strong></label>
-                            <p class="description">The URL path where the music player will appear. E.g., setting it to <code>music</code> makes it available at <code><?php echo esc_url( site_url( '/music' ) ); ?></code></p>
-                            <div class="vibe-slug-input">
-                                <span class="vibe-slug-prefix"><?php echo esc_html( site_url( '/' ) ); ?></span>
-                                <input type="text" id="vibe_slug" name="vibe_slug" value="<?php echo esc_attr( $slug ); ?>" class="regular-text" placeholder="vibe" pattern="[a-z0-9\-]+" required />
+                    <div class="vibe-two-col" style="grid-template-columns: 1fr 1fr;">
+                        <!-- Frontend Settings -->
+                        <div class="vibe-card">
+                            <h2><span class="dashicons dashicons-admin-settings"></span> General Configuration</h2>
+                            <div class="vibe-form-group">
+                                <label for="vibe_slug">Player Slug</label>
+                                <p class="description" style="margin-bottom:10px;">URL path for the music player.</p>
+                                <div class="vibe-slug-input" style="display:flex; align-items:center; background:#fcfcfc; border:1.5px solid #eee; border-radius:12px; overflow:hidden;">
+                                    <span style="padding:10px 15px; background:#eee; color:#666; font-size:12px; border-right:1px solid #ddd;"><?php echo esc_html( site_url( '/' ) ); ?></span>
+                                    <input type="text" id="vibe_slug" name="vibe_slug" value="<?php echo esc_attr( $slug ); ?>" style="border:none !important; border-radius:0 !important; flex:1;" />
+                                </div>
                             </div>
-                            <p class="description">Use lowercase letters, numbers, and hyphens only.</p>
+                            <div class="vibe-form-group">
+                                <label for="vibe_player_name">Player Name</label>
+                                <input type="text" id="vibe_player_name" name="vibe_player_name" value="<?php echo esc_attr( $player_name ); ?>" />
+                            </div>
+                            <div class="vibe-form-group">
+                                <label for="vibe_tagline">Tagline</label>
+                                <input type="text" id="vibe_tagline" name="vibe_tagline" value="<?php echo esc_attr( $tagline ); ?>" />
+                            </div>
                         </div>
-                        <div class="vibe-form-group">
-                            <label for="vibe_player_name"><strong>Player Name</strong></label>
-                            <input type="text" id="vibe_player_name" name="vibe_player_name" value="<?php echo esc_attr( $player_name ); ?>" class="regular-text" placeholder="VIBE" />
-                        </div>
-                        <div class="vibe-form-group">
-                            <label for="vibe_tagline"><strong>Tagline</strong></label>
-                            <input type="text" id="vibe_tagline" name="vibe_tagline" value="<?php echo esc_attr( $tagline ); ?>" class="regular-text" placeholder="Live the Sound" />
+
+                        <!-- Appearance & Security -->
+                        <div class="vibe-card">
+                            <h2><span class="dashicons dashicons-admin-appearance"></span> Experience & Security</h2>
+                            <div class="vibe-form-group">
+                                <label for="vibe_primary_color">Primary Accent Color</label>
+                                <p class="description" style="margin-bottom:10px;">The main brand color used in the player UI.</p>
+                                <input type="color" id="vibe_primary_color" name="vibe_primary_color" value="<?php echo esc_attr( $primary_color ); ?>" style="height:50px; padding:5px !important;" />
+                            </div>
+                            <div class="vibe-form-group" style="background:#fcfcfc; padding:20px; border-radius:16px; border:1px solid #eee;">
+                                <label style="display:flex; align-items:center; gap:12px; cursor:pointer; margin:0;">
+                                    <input type="checkbox" name="vibe_allow_registration" value="1" <?php checked( $allow_reg, '1' ); ?> style="width:auto !important;" />
+                                    <span>Allow User Registration & Public Playlists</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Appearance Settings -->
-                    <div class="vibe-card">
-                        <h2>🎨 Appearance</h2>
-                        <div class="vibe-form-group">
-                            <label for="vibe_primary_color"><strong>Primary Accent Color</strong></label>
-                            <p class="description">The main brand color used in the player UI.</p>
-                            <input type="color" id="vibe_primary_color" name="vibe_primary_color" value="<?php echo esc_attr( $primary_color ); ?>" />
-                        </div>
-                        <div class="vibe-form-group">
-                            <label><strong>Allow User Registration</strong></label>
-                            <label>
-                                <input type="checkbox" name="vibe_allow_registration" value="1" <?php checked( $allow_reg, '1' ); ?> />
-                                Show Login / Register pages in the player
-                            </label>
-                        </div>
+                    <div style="text-align: right; margin-top: 20px;">
+                        <button type="submit" class="vibe-btn vibe-btn-primary vibe-btn-lg">Save All Changes</button>
                     </div>
-                </div>
-
-                <p class="submit">
-                    <button type="submit" class="vibe-btn vibe-btn-primary vibe-btn-lg">Save Settings</button>
-                </p>
-            </form>
+                </form>
+            </div>
         </div>
         <?php
     }

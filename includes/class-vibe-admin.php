@@ -13,6 +13,9 @@ class Vibe_Admin {
         add_action( 'admin_post_vibe_save_settings', [ $this, 'save_settings' ] );
         add_action( 'admin_post_vibe_save_genre', [ $this, 'save_genre' ] );
         add_action( 'admin_post_vibe_delete_genre', [ $this, 'delete_genre' ] );
+        add_action( 'admin_post_vibe_save_artist', [ $this, 'save_artist' ] );
+        add_action( 'admin_post_vibe_save_album', [ $this, 'save_album' ] );
+        add_action( 'admin_post_vibe_save_track', [ $this, 'save_track' ] );
     }
 
     // -------------------------------------------------------------------------
@@ -34,14 +37,13 @@ class Vibe_Admin {
         // Dashboard (same as main)
         add_submenu_page( 'vibe-music', 'Dashboard', 'Dashboard', 'manage_options', 'vibe-music', [ $this, 'dashboard_page' ] );
 
-        // Artists
-        add_submenu_page( 'vibe-music', 'Artists', 'Artists', 'manage_options', 'edit.php?post_type=vibe_artist' );
+        // Studio (Unified Creator)
+        add_submenu_page( 'vibe-music', 'VIBE Studio', 'VIBE Studio', 'manage_options', 'vibe-studio', [ $this, 'studio_page' ] );
 
-        // Albums
-        add_submenu_page( 'vibe-music', 'Albums', 'Albums', 'manage_options', 'edit.php?post_type=vibe_album' );
-
-        // Tracks
-        add_submenu_page( 'vibe-music', 'Tracks', 'Tracks', 'manage_options', 'edit.php?post_type=vibe_track' );
+        // Links to Studio tabs (replacing standard list tables)
+        add_submenu_page( 'vibe-music', 'Artists', 'Artists', 'manage_options', 'vibe-studio&tab=artists', [ $this, 'studio_page' ] );
+        add_submenu_page( 'vibe-music', 'Albums', 'Albums', 'manage_options', 'vibe-studio&tab=albums', [ $this, 'studio_page' ] );
+        add_submenu_page( 'vibe-music', 'Tracks', 'Tracks', 'manage_options', 'vibe-studio&tab=tracks', [ $this, 'studio_page' ] );
 
         // Genres
         add_submenu_page( 'vibe-music', 'Genres', 'Genres', 'manage_options', 'vibe-genres', [ $this, 'genres_page' ] );
@@ -97,7 +99,7 @@ class Vibe_Admin {
                     <a href="<?php echo esc_url( $site_url ); ?>" target="_blank" class="vibe-btn vibe-btn-outline">
                         <span class="dashicons dashicons-external"></span> View Player
                     </a>
-                    <a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=vibe_track' ) ); ?>" class="vibe-btn vibe-btn-primary">
+                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=vibe-studio&tab=tracks' ) ); ?>" class="vibe-btn vibe-btn-primary">
                         <span class="dashicons dashicons-plus"></span> Add Track
                     </a>
                 </div>
@@ -117,7 +119,7 @@ class Vibe_Admin {
                         <div class="vibe-stat-number"><?php echo esc_html( $artist_count ); ?></div>
                         <div class="vibe-stat-label">Artists</div>
                     </div>
-                    <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=vibe_artist' ) ); ?>" class="vibe-stat-link">Manage →</a>
+                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=vibe-studio&tab=artists' ) ); ?>" class="vibe-stat-link">Manage →</a>
                 </div>
                 <div class="vibe-stat-card">
                     <div class="vibe-stat-icon dashicons dashicons-album"></div>
@@ -125,7 +127,7 @@ class Vibe_Admin {
                         <div class="vibe-stat-number"><?php echo esc_html( $album_count ); ?></div>
                         <div class="vibe-stat-label">Albums</div>
                     </div>
-                    <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=vibe_album' ) ); ?>" class="vibe-stat-link">Manage →</a>
+                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=vibe-studio&tab=albums' ) ); ?>" class="vibe-stat-link">Manage →</a>
                 </div>
                 <div class="vibe-stat-card">
                     <div class="vibe-stat-icon dashicons dashicons-format-audio"></div>
@@ -133,7 +135,7 @@ class Vibe_Admin {
                         <div class="vibe-stat-number"><?php echo esc_html( $track_count ); ?></div>
                         <div class="vibe-stat-label">Tracks</div>
                     </div>
-                    <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=vibe_track' ) ); ?>" class="vibe-stat-link">Manage →</a>
+                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=vibe-studio&tab=tracks' ) ); ?>" class="vibe-stat-link">Manage →</a>
                 </div>
                 <div class="vibe-stat-card vibe-stat-card--url">
                     <div class="vibe-stat-icon dashicons dashicons-admin-links"></div>
@@ -149,7 +151,7 @@ class Vibe_Admin {
             <div class="vibe-section">
                 <div class="vibe-section-header">
                     <h2>Recent Tracks</h2>
-                    <a href="<?php echo esc_url( admin_url( 'edit.php?post_type=vibe_track' ) ); ?>" class="vibe-link">View all →</a>
+                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=vibe-studio&tab=tracks' ) ); ?>" class="vibe-link">View all →</a>
                 </div>
                 <table class="vibe-table">
                     <thead>
@@ -180,11 +182,291 @@ class Vibe_Admin {
                         </tr>
                         <?php endforeach; ?>
                         <?php if ( empty( $recent_tracks ) ) : ?>
-                        <tr><td colspan="5" class="vibe-empty-state">No tracks yet. <a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=vibe_track' ) ); ?>">Add your first track →</a></td></tr>
+                        <tr><td colspan="5" class="vibe-empty-state">No tracks yet. <a href="<?php echo esc_url( admin_url( 'admin.php?page=vibe-studio&tab=tracks' ) ); ?>">Add your first track →</a></td></tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
             </div>
+        </div>
+        <?php
+    }
+
+    // -------------------------------------------------------------------------
+    // STUDIO PAGE (Custom Creator)
+    // -------------------------------------------------------------------------
+
+    public function studio_page() {
+        $active_tab = $_GET['tab'] ?? 'artists';
+        $tabs = [
+            'artists' => 'Artists',
+            'albums'  => 'Albums',
+            'tracks'  => 'Tracks',
+        ];
+        ?>
+        <div class="wrap vibe-admin-wrap">
+            <div class="vibe-admin-header">
+                <div class="vibe-logo">
+                    <span class="vibe-logo-text">VIBE Studio</span>
+                    <span class="vibe-version">Creator Portal</span>
+                </div>
+                <div class="vibe-header-actions">
+                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=vibe-music' ) ); ?>" class="vibe-btn vibe-btn-outline">
+                        <span class="dashicons dashicons-dashboard"></span> Dashboard
+                    </a>
+                </div>
+            </div>
+
+            <!-- Studio Tabs -->
+            <h2 class="nav-tab-wrapper vibe-tabs">
+                <?php foreach ( $tabs as $id => $label ) : ?>
+                    <a href="?page=vibe-studio&tab=<?php echo $id; ?>" class="nav-tab <?php echo $active_tab === $id ? 'nav-tab-active' : ''; ?>">
+                        <?php echo esc_html( $label ); ?>
+                    </a>
+                <?php endforeach; ?>
+            </h2>
+
+            <div class="vibe-studio-content" style="margin-top: 24px;">
+                <?php
+                switch ( $active_tab ) {
+                    case 'artists': $this->render_studio_artists(); break;
+                    case 'albums':  $this->render_studio_albums(); break;
+                    case 'tracks':  $this->render_studio_tracks(); break;
+                }
+                ?>
+            </div>
+        </div>
+        <script>
+        // Global media selector helper
+        function vibeSelectMedia(title, type, callback) {
+            var frame = wp.media({
+                title: title,
+                button: { text: 'Select' },
+                library: { type: type },
+                multiple: false
+            });
+            frame.on('select', function() {
+                var attachment = frame.state().get('selection').first().toJSON();
+                callback(attachment);
+            });
+            frame.open();
+        }
+        </script>
+        <?php
+    }
+
+    private function render_studio_artists() {
+        $artists = get_posts( [ 'post_type' => 'vibe_artist', 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC' ] );
+        ?>
+        <div class="vibe-two-col">
+            <div class="vibe-card">
+                <h2>Add New Artist</h2>
+                <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+                    <?php wp_nonce_field( 'vibe_save_artist', 'vibe_artist_nonce' ); ?>
+                    <input type="hidden" name="action" value="vibe_save_artist" />
+                    <div class="vibe-form-group">
+                        <label>Artist Name</label>
+                        <input type="text" name="artist_title" required class="large-text" placeholder="e.g. The Weeknd" />
+                    </div>
+                    <div class="vibe-form-group">
+                        <label>Profile Image</label>
+                        <div class="vibe-media-uploader">
+                            <input type="hidden" name="artist_image_id" id="artist_image_id" />
+                            <div class="vibe-media-preview" id="artist_image_preview"></div>
+                            <button type="button" class="button" onclick="vibeSelectMedia('Select Artist Image', 'image', function(a){ 
+                                document.getElementById('artist_image_id').value = a.id;
+                                document.getElementById('artist_image_preview').innerHTML = '<img src=\''+a.url+'\' style=\'width:100%;height:100%;object-fit:cover;border-radius:4px;\' />';
+                            })">Choose Image</button>
+                        </div>
+                    </div>
+                    <div class="vibe-form-group">
+                        <label>Monthly Listeners</label>
+                        <input type="number" name="artist_listeners" class="regular-text" placeholder="e.g. 5000000" />
+                    </div>
+                    <div class="vibe-form-group">
+                        <label>Bio</label>
+                        <textarea name="artist_bio" rows="4" class="large-text" placeholder="Short biography..."></textarea>
+                    </div>
+                    <div class="vibe-form-group">
+                        <label>Spotify URL</label>
+                        <input type="url" name="artist_spotify" class="large-text" />
+                    </div>
+                    <button type="submit" class="vibe-btn vibe-btn-primary">Create Artist</button>
+                </form>
+            </div>
+            <div class="vibe-card">
+                <h2>Existing Artists</h2>
+                <table class="vibe-table">
+                    <thead><tr><th>Image</th><th>Name</th><th>Listeners</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        <?php foreach ( $artists as $artist ) : 
+                            $img = get_the_post_thumbnail_url( $artist->ID, 'thumbnail' );
+                            $listeners = get_post_meta( $artist->ID, '_vibe_artist_monthly_listeners', true );
+                        ?>
+                        <tr>
+                            <td width="50"><img src="<?php echo $img ?: 'https://via.placeholder.com/40'; ?>" width="40" height="40" style="border-radius:4px;object-fit:cover;" /></td>
+                            <td><strong><?php echo esc_html( $artist->post_title ); ?></strong></td>
+                            <td><?php echo number_format( $listeners ?: 0 ); ?></td>
+                            <td><a href="<?php echo get_edit_post_link( $artist->ID ); ?>" class="vibe-action-link">Edit</a></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <?php
+    }
+
+    private function render_studio_albums() {
+        $artists = get_posts( [ 'post_type' => 'vibe_artist', 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC' ] );
+        $albums  = get_posts( [ 'post_type' => 'vibe_album', 'numberposts' => -1, 'orderby' => 'date', 'order' => 'DESC' ] );
+        ?>
+        <div class="vibe-two-col">
+            <div class="vibe-card">
+                <h2>Add New Album</h2>
+                <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+                    <?php wp_nonce_field( 'vibe_save_album', 'vibe_album_nonce' ); ?>
+                    <input type="hidden" name="action" value="vibe_save_album" />
+                    <div class="vibe-form-group">
+                        <label>Album Title</label>
+                        <input type="text" name="album_title" required class="large-text" placeholder="e.g. After Hours" />
+                    </div>
+                    <div class="vibe-form-group">
+                        <label>Artist</label>
+                        <select name="album_artist" required class="large-text">
+                            <option value="">— Select Artist —</option>
+                            <?php foreach ( $artists as $a ) : ?>
+                                <option value="<?php echo $a->ID; ?>"><?php echo esc_html( $a->post_title ); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="vibe-form-group">
+                        <label>Cover Art</label>
+                        <div class="vibe-media-uploader">
+                            <input type="hidden" name="album_image_id" id="album_image_id" />
+                            <div class="vibe-media-preview" id="album_image_preview"></div>
+                            <button type="button" class="button" onclick="vibeSelectMedia('Select Album Cover', 'image', function(a){ 
+                                document.getElementById('album_image_id').value = a.id;
+                                document.getElementById('album_image_preview').innerHTML = '<img src=\''+a.url+'\' style=\'width:100%;height:100%;object-fit:cover;border-radius:4px;\' />';
+                            })">Choose Cover</button>
+                        </div>
+                    </div>
+                    <div class="vibe-form-group">
+                        <label>Release Date</label>
+                        <input type="date" name="album_date" class="regular-text" />
+                    </div>
+                    <button type="submit" class="vibe-btn vibe-btn-primary">Create Album</button>
+                </form>
+            </div>
+            <div class="vibe-card">
+                <h2>Existing Albums</h2>
+                <table class="vibe-table">
+                    <thead><tr><th>Cover</th><th>Title</th><th>Artist</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        <?php foreach ( $albums as $album ) : 
+                            $img = get_the_post_thumbnail_url( $album->ID, 'thumbnail' );
+                            $artist_id = get_post_meta( $album->ID, '_vibe_album_artist', true );
+                            $artist_name = $artist_id ? get_the_title( $artist_id ) : '—';
+                        ?>
+                        <tr>
+                            <td width="50"><img src="<?php echo $img ?: 'https://via.placeholder.com/40'; ?>" width="40" height="40" style="border-radius:4px;object-fit:cover;" /></td>
+                            <td><strong><?php echo esc_html( $album->post_title ); ?></strong></td>
+                            <td><?php echo esc_html( $artist_name ); ?></td>
+                            <td><a href="<?php echo get_edit_post_link( $album->ID ); ?>" class="vibe-action-link">Edit</a></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <?php
+    }
+
+    private function render_studio_tracks() {
+        $artists = get_posts( [ 'post_type' => 'vibe_artist', 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC' ] );
+        $albums  = get_posts( [ 'post_type' => 'vibe_album', 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC' ] );
+        $genres  = get_terms( [ 'taxonomy' => 'vibe_genre', 'hide_empty' => false ] );
+        $tracks  = get_posts( [ 'post_type' => 'vibe_track', 'numberposts' => 15, 'orderby' => 'date', 'order' => 'DESC' ] );
+        ?>
+        <div class="vibe-two-col">
+            <div class="vibe-card">
+                <h2>Add New Track</h2>
+                <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+                    <?php wp_nonce_field( 'vibe_save_track', 'vibe_track_nonce' ); ?>
+                    <input type="hidden" name="action" value="vibe_save_track" />
+                    <div class="vibe-form-group">
+                        <label>Track Title</label>
+                        <input type="text" name="track_title" required class="large-text" placeholder="e.g. Blinding Lights" />
+                    </div>
+                    <div class="vibe-form-group">
+                        <label>Audio File</label>
+                        <div class="vibe-media-uploader">
+                            <input type="text" name="track_audio_url" id="track_audio_url" class="large-text" placeholder="URL or select file" required />
+                            <button type="button" class="button" onclick="vibeSelectMedia('Select Audio File', 'audio', function(a){ 
+                                document.getElementById('track_audio_url').value = a.url;
+                                if (a.caption) { /* handle caption if needed */ }
+                            })">Choose Audio</button>
+                        </div>
+                    </div>
+                    <div class="vibe-form-group" style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <label>Artist</label>
+                            <select name="track_artist" required class="large-text">
+                                <option value="">— Select Artist —</option>
+                                <?php foreach ( $artists as $a ) : ?>
+                                    <option value="<?php echo $a->ID; ?>"><?php echo esc_html( $a->post_title ); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Album (optional)</label>
+                            <select name="track_album" class="large-text">
+                                <option value="">— Single / No Album —</option>
+                                <?php foreach ( $albums as $al ) : ?>
+                                    <option value="<?php echo $al->ID; ?>"><?php echo esc_html( $al->post_title ); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="vibe-form-group" style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <label>Genre</label>
+                            <select name="track_genre" class="large-text">
+                                <option value="">— Select Genre —</option>
+                                <?php foreach ( $genres as $g ) : ?>
+                                    <option value="<?php echo $g->term_id; ?>"><?php echo esc_html( $g->name ); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Duration (mm:ss)</label>
+                            <input type="text" name="track_duration" class="large-text" placeholder="e.g. 3:24" />
+                        </div>
+                    </div>
+                    <button type="submit" class="vibe-btn vibe-btn-primary">Create Track</button>
+                </form>
+            </div>
+            <div class="vibe-card">
+                <h2>Recent Tracks</h2>
+                <table class="vibe-table">
+                    <thead><tr><th>Title</th><th>Artist</th><th>Album</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        <?php foreach ( $tracks as $track ) : 
+                            $artist_id = get_post_meta( $track->ID, '_vibe_track_artist', true );
+                            $album_id  = get_post_meta( $track->ID, '_vibe_track_album', true );
+                        ?>
+                        <tr>
+                            <td><strong><?php echo esc_html( $track->post_title ); ?></strong></td>
+                            <td><?php echo $artist_id ? esc_html( get_the_title( $artist_id ) ) : '—'; ?></td>
+                            <td><?php echo $album_id ? esc_html( get_the_title( $album_id ) ) : '—'; ?></td>
+                            <td><a href="<?php echo get_edit_post_link( $track->ID ); ?>" class="vibe-action-link">Edit</a></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <?php
+    } </div>
         </div>
         <?php
     }
@@ -378,6 +660,72 @@ class Vibe_Admin {
         }
         wp_delete_term( $term_id, 'vibe_genre' );
         wp_redirect( admin_url( 'admin.php?page=vibe-genres' ) );
+        exit;
+    }
+
+    public function save_artist() {
+        if ( ! current_user_can( 'manage_options' ) || ! wp_verify_nonce( $_POST['vibe_artist_nonce'], 'vibe_save_artist' ) ) wp_die( 'Unauthorized' );
+        
+        $title = sanitize_text_field( $_POST['artist_title'] );
+        $artist_id = wp_insert_post([
+            'post_type'   => 'vibe_artist',
+            'post_title'  => $title,
+            'post_status' => 'publish',
+        ]);
+
+        if ( $artist_id ) {
+            if ( ! empty( $_POST['artist_image_id'] ) ) set_post_thumbnail( $artist_id, absint( $_POST['artist_image_id'] ) );
+            update_post_meta( $artist_id, '_vibe_artist_monthly_listeners', sanitize_text_field( $_POST['artist_listeners'] ) );
+            update_post_meta( $artist_id, '_vibe_artist_bio', sanitize_textarea_field( $_POST['artist_bio'] ) );
+            update_post_meta( $artist_id, '_vibe_artist_spotify_url', esc_url_raw( $_POST['artist_spotify'] ) );
+        }
+
+        wp_redirect( admin_url( 'admin.php?page=vibe-studio&tab=artists&saved=1' ) );
+        exit;
+    }
+
+    public function save_album() {
+        if ( ! current_user_can( 'manage_options' ) || ! wp_verify_nonce( $_POST['vibe_album_nonce'], 'vibe_save_album' ) ) wp_die( 'Unauthorized' );
+        
+        $title = sanitize_text_field( $_POST['album_title'] );
+        $album_id = wp_insert_post([
+            'post_type'   => 'vibe_album',
+            'post_title'  => $title,
+            'post_status' => 'publish',
+        ]);
+
+        if ( $album_id ) {
+            if ( ! empty( $_POST['album_image_id'] ) ) set_post_thumbnail( $album_id, absint( $_POST['album_image_id'] ) );
+            update_post_meta( $album_id, '_vibe_album_artist', absint( $_POST['album_artist'] ) );
+            update_post_meta( $album_id, '_vibe_album_release_date', sanitize_text_field( $_POST['album_date'] ) );
+        }
+
+        wp_redirect( admin_url( 'admin.php?page=vibe-studio&tab=albums&saved=1' ) );
+        exit;
+    }
+
+    public function save_track() {
+        if ( ! current_user_can( 'manage_options' ) || ! wp_verify_nonce( $_POST['vibe_track_nonce'], 'vibe_save_track' ) ) wp_die( 'Unauthorized' );
+        
+        $title = sanitize_text_field( $_POST['track_title'] );
+        $track_id = wp_insert_post([
+            'post_type'   => 'vibe_track',
+            'post_title'  => $title,
+            'post_status' => 'publish',
+        ]);
+
+        if ( $track_id ) {
+            update_post_meta( $track_id, '_vibe_track_file_url', esc_url_raw( $_POST['track_audio_url'] ) );
+            update_post_meta( $track_id, '_vibe_track_artist', absint( $_POST['track_artist'] ) );
+            update_post_meta( $track_id, '_vibe_track_album', absint( $_POST['track_album'] ) );
+            update_post_meta( $track_id, '_vibe_track_duration', sanitize_text_field( $_POST['track_duration'] ) );
+            
+            if ( ! empty( $_POST['track_genre'] ) ) {
+                wp_set_object_terms( $track_id, absint( $_POST['track_genre'] ), 'vibe_genre' );
+            }
+        }
+
+        wp_redirect( admin_url( 'admin.php?page=vibe-studio&tab=tracks&saved=1' ) );
         exit;
     }
 

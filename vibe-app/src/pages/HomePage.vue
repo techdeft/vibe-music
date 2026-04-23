@@ -44,6 +44,29 @@
         </div>
       </section>
 
+      <!-- Trending Tracks -->
+      <section v-if="discovery.trending_tracks?.length" class="section">
+        <div class="section-header">
+          <h2 class="section-title">Trending Now</h2>
+        </div>
+        <div class="tracks-header-row">
+          <span class="th th-num">#</span>
+          <span class="th">Title</span>
+          <span class="th">Album</span>
+          <span class="th th-streams">Plays</span>
+          <span class="th th-dur"><span class="material-symbols-outlined" style="font-size:16px">schedule</span></span>
+        </div>
+        <div class="divider"></div>
+        <TrackRow
+          v-for="(track, i) in discovery.trending_tracks"
+          :key="track.id"
+          :track="track"
+          :number="i + 1"
+          :queue="discovery.trending_tracks"
+          show-cover
+        />
+      </section>
+
       <!-- Recent Tracks -->
       <section v-if="discovery.recent_tracks?.length" class="section">
         <div class="section-header">
@@ -53,6 +76,7 @@
           <span class="th th-num">#</span>
           <span class="th">Title</span>
           <span class="th">Album</span>
+          <span class="th th-streams">Plays</span>
           <span class="th th-dur">
             <span class="material-symbols-outlined" style="font-size:16px">schedule</span>
           </span>
@@ -379,7 +403,7 @@ function genreColor(slug) {
 /* Track list header */
 .tracks-header-row {
   display: grid;
-  grid-template-columns: 48px 1fr 1fr 60px;
+  grid-template-columns: 48px 1fr 1fr 100px 60px;
   padding: 0 16px;
   margin-bottom: 6px;
 }
@@ -393,6 +417,7 @@ function genreColor(slug) {
 }
 
 .th-num { text-align: center; }
+.th-streams { text-align: right; padding-right: 24px; }
 .th-dur { text-align: right; }
 
 .divider {

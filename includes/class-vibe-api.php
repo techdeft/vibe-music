@@ -78,6 +78,14 @@ class Vibe_API {
             'callback'            => [ $this, 'get_tracks_by_genre' ],
             'permission_callback' => '__return_true',
         ] );
+
+        // Track Stream (Increment count)
+        register_rest_route( self::NAMESPACE, '/track/(?P<id>\d+)/stream', [
+            'methods'             => 'POST',
+            'callback'            => [ $this, 'track_stream' ],
+            'permission_callback' => '__return_true',
+            'args'                => [ 'id' => [ 'validate_callback' => fn( $p ) => is_numeric( $p ) ] ],
+        ] );
     }
 
     // -------------------------------------------------------------------------
@@ -105,6 +113,13 @@ class Vibe_API {
                 'post_type'   => 'vibe_track',
                 'numberposts' => 20,
                 'orderby'     => 'date',
+                'order'       => 'DESC',
+            ] ) ),
+            'trending_tracks'  => $this->format_tracks( get_posts( [
+                'post_type'   => 'vibe_track',
+                'numberposts' => 5,
+                'meta_key'    => '_vibe_stream_count',
+                'orderby'     => 'meta_value_num',
                 'order'       => 'DESC',
             ] ) ),
             'genres'           => $this->format_genres( get_terms( [ 'taxonomy' => 'vibe_genre', 'hide_empty' => false ] ) ),
@@ -154,6 +169,9 @@ class Vibe_API {
             'post_type'   => 'vibe_track',
             'numberposts' => 10,
             'meta_query'  => [ [ 'key' => '_vibe_track_artist', 'value' => $id ] ],
+            'meta_key'    => '_vibe_stream_count',
+            'orderby'     => 'meta_value_num',
+            'order'       => 'DESC',
         ] );
         $artist['top_tracks'] = $this->format_tracks( $tracks );
 
@@ -261,6 +279,15 @@ class Vibe_API {
         ] );
     }
 
+    public function track_stream( $request ) {
+        $id = intval( $request['id'] );
+        $count = (int) get_post_meta( $id, '_vibe_stream_count', true );
+        $count++;
+        update_post_meta( $id, '_vibe_stream_count', $count );
+
+        return rest_ensure_response( [ 'success' => true, 'streams' => $count ] );
+    }
+
     // -------------------------------------------------------------------------
     // FORMATTERS
     // -------------------------------------------------------------------------
@@ -321,6 +348,7 @@ class Vibe_API {
             'lyrics'      => get_post_meta( $post->ID, '_vibe_track_lyrics', true ),
             'genres'      => $this->format_genres( wp_get_post_terms( $post->ID, 'vibe_genre' ) ),
             'featured'    => get_post_meta( $post->ID, '_vibe_track_featured', true ) === '1',
+            'streams'     => (int) get_post_meta( $post->ID, '_vibe_stream_count', true ),
         ];
     }
 

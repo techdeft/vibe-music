@@ -40,6 +40,7 @@
           <span class="th th-num">#</span>
           <span class="th">Title</span>
           <span class="th">Album</span>
+          <span class="th th-streams">Plays</span>
           <span class="th th-dur"><span class="material-symbols-outlined" style="font-size:16px">schedule</span></span>
         </div>
         <div class="divider"></div>
@@ -254,13 +255,14 @@ watch(() => route.params.id, load)
 
 .tracks-header-row {
   display: grid;
-  grid-template-columns: 48px 1fr 1fr 60px;
+  grid-template-columns: 48px 1fr 1fr 100px 60px;
   padding: 0 16px;
   margin-bottom: 6px;
 }
 
 .th { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #666; }
 .th-num { text-align: center; }
+.th-streams { text-align: right; padding-right: 24px; }
 .th-dur { text-align: right; }
 
 .divider { height: 1px; background: #1A1A1A; margin-bottom: 8px; }

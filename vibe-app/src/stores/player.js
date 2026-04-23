@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { Howl } from 'howler'
+import { api } from '@/services/api'
 
 export const usePlayerStore = defineStore('player', () => {
   // State
@@ -18,6 +19,7 @@ export const usePlayerStore = defineStore('player', () => {
 
   let howl = null
   let progressInterval = null
+  const trackedStreams = new Set() // Track IDs played in this session to avoid double counting
 
   // Computed
   const currentTrack = computed(() => queue.value[currentIndex.value] || null)
@@ -47,6 +49,16 @@ export const usePlayerStore = defineStore('player', () => {
     }, 500)
   }
 
+  async function recordStream(trackId) {
+    if (!trackId || trackedStreams.has(trackId)) return
+    try {
+      await api.trackStream(trackId)
+      trackedStreams.add(trackId)
+    } catch (e) {
+      console.error('Failed to record stream:', e)
+    }
+  }
+
   function loadTrack(track) {
     clearHowl()
     isLoading.value = true
@@ -67,6 +79,7 @@ export const usePlayerStore = defineStore('player', () => {
       onplay: () => {
         isPlaying.value = true
         startProgressTracking()
+        recordStream(track.id)
       },
       onpause: () => {
         isPlaying.value = false

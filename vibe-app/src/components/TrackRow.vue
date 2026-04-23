@@ -1,5 +1,12 @@
 <template>
-  <div class="track-row" :class="{ playing: isCurrentTrack, active }" @dblclick="play" @mouseenter="hovering = true" @mouseleave="hovering = false">
+  <div 
+    class="track-row" 
+    :class="{ playing: isCurrentTrack, active }" 
+    :style="gridStyle"
+    @dblclick="play" 
+    @mouseenter="hovering = true" 
+    @mouseleave="hovering = false"
+  >
     <!-- Number / Play indicator -->
     <div class="col-num">
       <span v-if="!hovering && !isCurrentTrack" class="track-num">{{ number }}</span>
@@ -32,6 +39,9 @@
       </RouterLink>
       <span v-else class="muted">—</span>
     </div>
+
+    <!-- Streams -->
+    <div class="col-streams">{{ formatStreams(track.streams) }}</div>
 
     <!-- Duration -->
     <div class="col-dur">{{ track.duration || '—' }}</div>
@@ -73,6 +83,15 @@ const showPlaylistModal = ref(false)
 const isCurrentTrack = computed(() => player.currentTrack?.id === props.track.id)
 const active = computed(() => isCurrentTrack.value)
 
+const gridStyle = computed(() => {
+  let cols = ['48px', '1fr'] // Num, Title
+  if (props.showAlbum) cols.push('1fr')
+  cols.push('100px') // Streams
+  cols.push('60px') // Duration
+  cols.push('48px') // Actions
+  return { gridTemplateColumns: cols.join(' ') }
+})
+
 function play() {
   if (isCurrentTrack.value) {
     player.togglePlay()
@@ -80,12 +99,18 @@ function play() {
     player.playTrack(props.track, props.queue)
   }
 }
+
+function formatStreams(n) {
+  if (!n) return '0'
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`
+  return n.toLocaleString()
+}
 </script>
 
 <style scoped>
 .track-row {
   display: grid;
-  grid-template-columns: 48px 1fr 1fr 60px 48px;
   align-items: center;
   height: 56px;
   padding: 0 16px;
@@ -188,6 +213,13 @@ function play() {
   overflow: hidden;
   text-overflow: ellipsis;
   padding-right: 12px;
+}
+
+.col-streams {
+  font-size: 13px;
+  color: #666;
+  text-align: right;
+  padding-right: 24px;
 }
 
 .col-dur {

@@ -80,6 +80,7 @@ export const api = {
   genres: () => get('/genres'),
   genreTracks: (slug) => get(`/genre/${slug}/tracks`),
   search: (q) => get('/search', { q }),
+  trackStream: (id) => post(`/track/${id}/stream`),
 
   // --- Auth ---
   authMe: () => get('/auth/me'),

@@ -1,0 +1,437 @@
+/* VIBE Music Admin Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --vibe-red: #FF0000;
+    --vibe-red-dark: #cc0000;
+    --vibe-bg: #0A0A0A;
+    --vibe-surface: #121212;
+    --vibe-surface-2: #1A1A1A;
+    --vibe-border: #2a2a2a;
+    --vibe-text: #e5e2e1;
+    --vibe-text-muted: #888;
+}
+
+.vibe-admin-wrap {
+    font-family: 'Inter', -apple-system, sans-serif;
+    max-width: 1400px;
+    margin: 0;
+    padding: 0 0 40px;
+}
+
+/* Header */
+.vibe-admin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 0 20px;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 28px;
+}
+
+.vibe-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.vibe-logo-text {
+    font-size: 28px;
+    font-weight: 900;
+    font-style: italic;
+    color: #cc0000;
+    letter-spacing: -1px;
+    line-height: 1;
+}
+
+.vibe-version {
+    font-size: 11px;
+    background: #f0f0f0;
+    color: #666;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.vibe-header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Buttons */
+.vibe-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    transition: all 0.15s ease;
+    line-height: 1.4;
+}
+
+.vibe-btn .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    line-height: 1;
+}
+
+.vibe-btn-primary {
+    background: #cc0000;
+    color: #fff !important;
+}
+
+.vibe-btn-primary:hover {
+    background: #aa0000;
+    color: #fff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(204, 0, 0, 0.3);
+}
+
+.vibe-btn-outline {
+    background: transparent;
+    color: #cc0000 !important;
+    border: 1.5px solid #cc0000;
+}
+
+.vibe-btn-outline:hover {
+    background: rgba(204, 0, 0, 0.06);
+}
+
+.vibe-btn-lg {
+    padding: 12px 28px;
+    font-size: 14px;
+}
+
+/* Stats Grid */
+.vibe-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.vibe-stat-card {
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.15s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.vibe-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: #cc0000;
+}
+
+.vibe-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.vibe-stat-icon {
+    font-size: 28px !important;
+    color: #cc0000;
+    background: rgba(204, 0, 0, 0.08);
+    padding: 10px;
+    border-radius: 10px;
+    width: 28px !important;
+    height: 28px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.vibe-stat-content {
+    flex: 1;
+}
+
+.vibe-stat-number {
+    font-size: 28px;
+    font-weight: 800;
+    color: #1a1a1a;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.vibe-stat-url {
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+    word-break: break-all;
+    line-height: 1.4;
+    margin-bottom: 4px;
+}
+
+.vibe-stat-label {
+    font-size: 12px;
+    color: #888;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.vibe-stat-link {
+    font-size: 12px;
+    color: #cc0000;
+    text-decoration: none;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.vibe-stat-link:hover {
+    text-decoration: underline;
+}
+
+/* Section */
+.vibe-section {
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.vibe-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.vibe-section-header h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.vibe-link {
+    font-size: 13px;
+    color: #cc0000;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* Table */
+.vibe-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.vibe-section > .vibe-table {
+    margin: 0;
+}
+
+.vibe-table thead th {
+    background: #fafafa;
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.vibe-table tbody td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f8f8f8;
+    color: #333;
+    vertical-align: middle;
+}
+
+.vibe-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.vibe-table tbody tr:hover td {
+    background: #fafafa;
+}
+
+.vibe-empty-state {
+    text-align: center;
+    color: #999;
+    padding: 32px !important;
+}
+
+.vibe-empty-state a {
+    color: #cc0000;
+}
+
+.vibe-action-link {
+    color: #cc0000;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 8px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+}
+
+.vibe-action-link:hover {
+    text-decoration: underline;
+}
+
+.vibe-action-link--danger {
+    color: #e53e3e;
+}
+
+/* Cards */
+.vibe-card {
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.vibe-card h2 {
+    margin: 0 0 20px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a1a;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* Two-column layout */
+.vibe-two-col {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 24px;
+}
+
+/* Settings Grid */
+.vibe-settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+/* Form Groups */
+.vibe-form-group {
+    margin-bottom: 20px;
+}
+
+.vibe-form-group:last-child {
+    margin-bottom: 0;
+}
+
+.vibe-form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    color: #333;
+}
+
+.vibe-form-group .description {
+    margin: 6px 0 8px;
+    color: #777;
+    font-size: 12px;
+    font-style: normal;
+}
+
+.vibe-form-group input[type=text],
+.vibe-form-group input[type=url],
+.vibe-form-group input[type=date],
+.vibe-form-group input[type=number],
+.vibe-form-group textarea,
+.vibe-form-group select {
+    border: 1.5px solid #ddd;
+    border-radius: 6px;
+    padding: 9px 12px;
+    font-size: 13px;
+    transition: border-color 0.15s;
+}
+
+.vibe-form-group input:focus,
+.vibe-form-group textarea:focus,
+.vibe-form-group select:focus {
+    border-color: #cc0000;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.1);
+}
+
+/* Slug input */
+.vibe-slug-input {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
+    max-width: 450px;
+}
+
+.vibe-slug-prefix {
+    background: #f5f5f5;
+    padding: 9px 12px;
+    font-size: 12px;
+    color: #666;
+    border-right: 1px solid #ddd;
+    white-space: nowrap;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vibe-slug-input input {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    flex: 1;
+}
+
+.vibe-slug-input input:focus {
+    box-shadow: none !important;
+}
+
+/* Admin menu icon highlight */
+#adminmenu .toplevel_page_vibe-music .wp-menu-image img {
+    width: 18px;
+    height: 18px;
+}
+
+/* Meta box table */
+.vibe-meta-table td {
+    padding: 8px 4px;
+}
+
+.vibe-meta-table input[type=text],
+.vibe-meta-table input[type=url],
+.vibe-meta-table input[type=number],
+.vibe-meta-table input[type=date],
+.vibe-meta-table textarea,
+.vibe-meta-table select {
+    border: 1.5px solid #ddd;
+    border-radius: 4px;
+    padding: 8px 10px;
+}
+
+@media (max-width: 1024px) {
+    .vibe-two-col { grid-template-columns: 1fr; }
+    .vibe-settings-grid { grid-template-columns: 1fr; }
+}

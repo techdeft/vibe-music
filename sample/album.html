@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BEAT - Album View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700;800;900&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#e5e2e1",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "inverse-on-surface": "#313030",
+                        "secondary-fixed": "#e5e2e1",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-tint": "#ffb4a8",
+                        "surface-variant": "#353534",
+                        "surface-container-highest": "#353534",
+                        "primary-fixed": "#ffdad4",
+                        "on-error": "#690005",
+                        "outline": "#b18780",
+                        "on-surface-variant": "#ebbbb4",
+                        "tertiary-container": "#909191",
+                        "surface-container": "#201f1f",
+                        "tertiary-fixed": "#e2e2e2",
+                        "surface-bright": "#3a3939",
+                        "primary-fixed-dim": "#ffb4a8",
+                        "on-secondary-container": "#b7b5b4",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "on-secondary-fixed-variant": "#474746",
+                        "on-primary": "#690100",
+                        "secondary": "#c8c6c5",
+                        "surface-dim": "#131313",
+                        "on-tertiary-container": "#282a2a",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "on-secondary-fixed": "#1c1b1b",
+                        "on-background": "#e5e2e1",
+                        "on-tertiary": "#2f3131",
+                        "on-secondary": "#313030",
+                        "background": "#131313",
+                        "outline-variant": "#603e39",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#930100",
+                        "on-primary-fixed": "#410000",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "error-container": "#93000a",
+                        "surface-container-low": "#1c1b1b",
+                        "tertiary": "#c6c6c7",
+                        "surface-container-high": "#2a2a2a",
+                        "primary-container": "#ff5540",
+                        "primary": "#ffb4a8",
+                        "inverse-primary": "#c00100",
+                        "error": "#ffb4ab",
+                        "secondary-container": "#474746",
+                        "surface": "#131313",
+                        "on-primary-container": "#5c0000",
+                        "surface-container-lowest": "#0e0e0e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "24px",
+                        "margin": "32px",
+                        "gutter": "24px",
+                        "xs": "4px",
+                        "lg": "40px",
+                        "xl": "64px",
+                        "sm": "12px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Spline Sans"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Spline Sans"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Spline Sans"],
+                        "label-sm": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #0A0A0A; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .track-row:hover .track-number { display: none; }
+        .track-row:hover .track-play-icon { display: block; }
+        .track-play-icon { display: none; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0A0A0A; }
+        ::-webkit-scrollbar-thumb { background: #353534; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ff5540; }
+    </style>
+</head>
+<body class="font-body-md text-on-surface antialiased overflow-x-hidden">
+<!-- Top Navigation Anchor -->
+<header class="flex items-center justify-between px-6 py-3 w-full bg-[#0A0A0A] bg-opacity-90 backdrop-blur-md docked full-width top-0 sticky z-50 shadow-[0_-4px_20px_rgba(255,0,0,0.1)]">
+<div class="flex items-center gap-8">
+<div class="text-2xl font-black text-red-600 italic font-['Spline_Sans'] font-bold uppercase tracking-widest">BEAT</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-zinc-500 hover:text-red-500 transition-colors duration-200 font-['Spline_Sans'] font-bold uppercase tracking-widest active:scale-95 transition-transform" href="#">Discover</a>
+<a class="text-white border-b-2 border-red-600 font-['Spline_Sans'] font-bold uppercase tracking-widest active:scale-95 transition-transform" href="#">Library</a>
+<a class="text-zinc-500 hover:text-red-500 transition-colors duration-200 font-['Spline_Sans'] font-bold uppercase tracking-widest active:scale-95 transition-transform" href="#">Live</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface hover:text-red-500 transition-colors" data-icon="search">search</button>
+<button class="material-symbols-outlined text-on-surface hover:text-red-500 transition-colors" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined text-on-surface hover:text-red-500 transition-colors" data-icon="settings">settings</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-red-600/30">
+<img alt="User profile" data-alt="Close-up portrait of a young man with a slight smile in soft studio lighting against a dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB25mC9Aur5BkIp9Hkcj5M7qGoQHL9S64-nwCD7CI501u2kO8zLurg5cF04mRwQnB12GvADZV8cq48J8BJQpnqH3tk-KdyWAc-YnI0kWXFdJXy2aVwlNcM-q2-XnviMOYj2Ug3wI2AiexaaHIBzNsOgnRg3gm9838SrDPC8akgiigqMJpvcRUFuJXQVAMGhJmLz3bQCKysaP96J5yYIhw_-1LeIhEuQppBLgdmPYW2wPF3FqiUtXb6z3-OPvrHgrZ7iN6BSiFkIVzI"/>
+</div>
+</div>
+</header>
+<div class="flex min-h-screen">
+<!-- Sidebar Anchor -->
+<aside class="flex flex-col h-screen fixed left-0 top-0 overflow-y-auto p-4 bg-[#121212] border-r border-zinc-900 w-64 hidden md:flex font-['Spline_Sans'] font-medium z-40 pt-20">
+<div class="flex flex-col gap-1 mb-8">
+<a class="text-zinc-500 px-4 py-3 hover:bg-[#1A1A1A] hover:text-white transition-all active:translate-x-1 flex items-center gap-3" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span> Home
+                </a>
+<a class="text-zinc-500 px-4 py-3 hover:bg-[#1A1A1A] hover:text-white transition-all active:translate-x-1 flex items-center gap-3" href="#">
+<span class="material-symbols-outlined" data-icon="explore">explore</span> Discover
+                </a>
+<a class="text-white bg-gradient-to-r from-red-600/20 to-transparent border-l-4 border-red-600 px-4 py-3 rounded-r-sm flex items-center gap-3 active:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="library_music" style="font-variation-settings: 'FILL' 1;">library_music</span> Library
+                </a>
+<a class="text-zinc-500 px-4 py-3 hover:bg-[#1A1A1A] hover:text-white transition-all active:translate-x-1 flex items-center gap-3" href="#">
+<span class="material-symbols-outlined" data-icon="sensors">sensors</span> Live
+                </a>
+</div>
+<div class="mt-4 px-4">
+<button class="w-full bg-primary-container text-on-primary-container py-3 rounded-full font-bold uppercase tracking-wider text-sm hover:scale-105 transition-transform shadow-[0_0_15px_rgba(255,85,64,0.3)]">
+                    Go Live
+                </button>
+</div>
+<div class="mt-10 flex flex-col gap-1">
+<div class="px-4 text-[10px] uppercase tracking-widest text-zinc-600 font-bold mb-2">Your Collection</div>
+<a class="text-zinc-500 px-4 py-2 hover:text-white transition-colors flex items-center gap-3" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="playlist_play">playlist_play</span> Playlists
+                </a>
+<a class="text-zinc-500 px-4 py-2 hover:text-white transition-colors flex items-center gap-3" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="favorite">favorite</span> Liked Songs
+                </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-64 pb-32">
+<!-- Hero Header Section -->
+<section class="relative pt-12 pb-10 px-6 md:px-12 bg-gradient-to-b from-red-900/20 to-[#0A0A0A]">
+<div class="flex flex-col md:flex-row items-end gap-8">
+<!-- Album Cover -->
+<div class="w-full max-w-[280px] aspect-square rounded-xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.8)] relative group">
+<img alt="Album artwork" class="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110" data-alt="Abstract vibrant red and black smoke art representing high energy electronic music with sharp contrast and cinematic grain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGFqwoO7gjbp-uHLxMzMrjkWHHkLKtVaNF4glK_isdg3wWy4Kz2afy6XnN-83dSNMGxEvWceHlcJNOgHn2m-u8IMA4xRxYX-BTmXlsmINcAbYW3yflYU10Feqb1sVUgHIxjutjPa_fYpKE9Z8M565So1OzwHDzWq8ISQm34zDE1yBvzCGAcMVtTK97l6aFL-m8O5viGp-aRRndW25f-Y9Kv2_wkEHXptDChDZ-bpvUk2pizLI5czd6HKbkCiAlbpj3rb1UJr5Bonk"/>
+<div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<span class="material-symbols-outlined text-6xl text-white drop-shadow-lg" data-icon="play_circle" style="font-variation-settings: 'FILL' 1;">play_circle</span>
+</div>
+</div>
+<!-- Album Info -->
+<div class="flex-1 space-y-4">
+<div class="inline-block px-3 py-1 bg-red-600 text-white text-[10px] font-bold uppercase tracking-[0.2em] rounded-sm">Premium Album</div>
+<h1 class="font-display-lg text-display-lg text-white leading-tight">NEON VELOCITY</h1>
+<div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-zinc-400">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full overflow-hidden border border-red-600/50">
+<img alt="Artist avatar" data-alt="Portrait of a musician with neon lighting highlights on their face against a dark studio background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQh2BCpmxUcs5SDjene2NZGfK5dR7ZXLrjN1lbDseRV8kNGrMTiflOwdzKkKdoQA9YMl8nIy87g3XspT_Lt5ACgHYek74X7BRPF3EeDeglzc_6VWnKxJH9O8Xfzvjk0V84P57A2HfJ23PDU2yNgLW42hGmIPWTT86LVWB3wqLrJEQ9hvQgPMsdWCS6h88ZBf_BY6WK0esF_1q81KYCmZ_7AP47csT9JUv6jf7l2wbRk2ZpegsBREabeTOFwk-JV4G6RaqdYF8oim8"/>
+</div>
+<span class="font-bold text-white hover:underline cursor-pointer">Pulse Audio</span>
+</div>
+<span class="flex items-center gap-1">• 2024</span>
+<span class="flex items-center gap-1">• 12 Songs</span>
+<span class="flex items-center gap-1">• 48 min 22 sec</span>
+</div>
+</div>
+</div>
+<!-- Action Bar -->
+<div class="mt-10 flex items-center gap-6">
+<button class="bg-red-600 hover:bg-red-500 text-white px-8 py-3 rounded-full flex items-center gap-2 font-bold uppercase tracking-wider transform hover:scale-105 transition-all shadow-[0_0_20px_rgba(255,0,0,0.4)]">
+<span class="material-symbols-outlined" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span> Play
+                    </button>
+<button class="w-12 h-12 rounded-full border border-zinc-700 flex items-center justify-center hover:border-red-600 hover:text-red-600 transition-all active:scale-90">
+<span class="material-symbols-outlined" data-icon="favorite">favorite</span>
+</button>
+<button class="w-12 h-12 rounded-full border border-zinc-700 flex items-center justify-center hover:border-white transition-all">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+</button>
+<button class="w-12 h-12 rounded-full border border-zinc-700 flex items-center justify-center hover:border-white transition-all">
+<span class="material-symbols-outlined" data-icon="more_horiz">more_horiz</span>
+</button>
+</div>
+</section>
+<!-- Tracklist Section -->
+<section class="px-6 md:px-12 mt-4">
+<div class="w-full border-b border-zinc-900 pb-2 mb-4 grid grid-cols-[48px_1fr_120px_60px] gap-4 text-zinc-500 font-bold text-[10px] uppercase tracking-widest">
+<div class="text-center">#</div>
+<div>Title</div>
+<div class="hidden sm:block">Plays</div>
+<div class="text-right pr-4"><span class="material-symbols-outlined text-sm" data-icon="schedule">schedule</span></div>
+</div>
+<div class="space-y-1">
+<!-- Track 1: Now Playing State -->
+<div class="grid grid-cols-[48px_1fr_120px_60px] gap-4 items-center py-3 px-2 rounded-lg bg-red-600/5 group">
+<div class="text-center">
+<span class="material-symbols-outlined text-red-600 animate-pulse text-lg" data-icon="equalizer">equalizer</span>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-red-600">Synthetic Dreams</span>
+<span class="text-xs text-zinc-500">Pulse Audio</span>
+</div>
+<div class="hidden sm:block text-sm text-zinc-500">1,245,890</div>
+<div class="text-right pr-4 text-sm text-zinc-400">3:45</div>
+</div>
+<!-- Track 2 -->
+<div class="track-row grid grid-cols-[48px_1fr_120px_60px] gap-4 items-center py-3 px-2 rounded-lg hover:bg-[#1A1A1A] transition-colors group cursor-pointer">
+<div class="text-center text-zinc-500 group-hover:text-white font-medium">
+<span class="track-number">2</span>
+<span class="material-symbols-outlined track-play-icon text-white" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-white">Circuit Breaker</span>
+<span class="text-xs text-zinc-500">Pulse Audio</span>
+</div>
+<div class="hidden sm:block text-sm text-zinc-500">892,112</div>
+<div class="text-right pr-4 text-sm text-zinc-500 group-hover:text-white">4:12</div>
+</div>
+<!-- Track 3 -->
+<div class="track-row grid grid-cols-[48px_1fr_120px_60px] gap-4 items-center py-3 px-2 rounded-lg hover:bg-[#1A1A1A] transition-colors group cursor-pointer">
+<div class="text-center text-zinc-500 group-hover:text-white font-medium">
+<span class="track-number">3</span>
+<span class="material-symbols-outlined track-play-icon text-white" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-white">Hyper-Drive</span>
+<span class="text-xs text-zinc-500">Pulse Audio, VectorX</span>
+</div>
+<div class="hidden sm:block text-sm text-zinc-500">765,403</div>
+<div class="text-right pr-4 text-sm text-zinc-500 group-hover:text-white">3:28</div>
+</div>
+<!-- Track 4 -->
+<div class="track-row grid grid-cols-[48px_1fr_120px_60px] gap-4 items-center py-3 px-2 rounded-lg hover:bg-[#1A1A1A] transition-colors group cursor-pointer">
+<div class="text-center text-zinc-500 group-hover:text-white font-medium">
+<span class="track-number">4</span>
+<span class="material-symbols-outlined track-play-icon text-white" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-white">Voltage Drift</span>
+<span class="text-xs text-zinc-500">Pulse Audio</span>
+</div>
+<div class="hidden sm:block text-sm text-zinc-500">543,001</div>
+<div class="text-right pr-4 text-sm text-zinc-500 group-hover:text-white">5:15</div>
+</div>
+<!-- Track 5 -->
+<div class="track-row grid grid-cols-[48px_1fr_120px_60px] gap-4 items-center py-3 px-2 rounded-lg hover:bg-[#1A1A1A] transition-colors group cursor-pointer">
+<div class="text-center text-zinc-500 group-hover:text-white font-medium">
+<span class="track-number">5</span>
+<span class="material-symbols-outlined track-play-icon text-white" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-white">Frequency Response</span>
+<span class="text-xs text-zinc-500">Pulse Audio</span>
+</div>
+<div class="hidden sm:block text-sm text-zinc-500">432,889</div>
+<div class="text-right pr-4 text-sm text-zinc-500 group-hover:text-white">3:58</div>
+</div>
+<!-- Track 6 -->
+<div class="track-row grid grid-cols-[48px_1fr_120px_60px] gap-4 items-center py-3 px-2 rounded-lg hover:bg-[#1A1A1A] transition-colors group cursor-pointer">
+<div class="text-center text-zinc-500 group-hover:text-white font-medium">
+<span class="track-number">6</span>
+<span class="material-symbols-outlined track-play-icon text-white" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-white">Digital Horizon</span>
+<span class="text-xs text-zinc-500">Pulse Audio</span>
+</div>
+<div class="hidden sm:block text-sm text-zinc-500">321,556</div>
+<div class="text-right pr-4 text-sm text-zinc-500 group-hover:text-white">4:44</div>
+</div>
+</div>
+<div class="mt-12 opacity-40 text-[10px] uppercase font-bold tracking-[0.3em] flex flex-col gap-1">
+<span>© 2024 BEAT RECORDS INC.</span>
+<span>℗ 2024 PULSE AUDIO UNDER EXCLUSIVE LICENSE TO BEAT RECORDS.</span>
+</div>
+</section>
+</main>
+</div>
+<!-- Persistent Player Shell (Component not explicitly requested but needed for high-end streaming UI) -->
+<div class="fixed bottom-0 left-0 w-full bg-[#121212]/95 backdrop-blur-xl border-t border-zinc-900 h-24 px-6 flex items-center justify-between z-50">
+<div class="flex items-center gap-4 w-1/3">
+<div class="w-14 h-14 rounded bg-[#1A1A1A] overflow-hidden shadow-lg border border-red-600/20">
+<img alt="Current playing" data-alt="Abstract vibrant red and black smoke art thumbnail for music player" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcmQuH_uMe3ZxOaMvuMcWYE117ToQSxf75Kf5AyK8bliJj0Hxp7Jj1PX_-Fob_Iy-YxJl3m-hi-OVyRbAAnFkWLDk7sHY0sIr6StWcwGPBLSIbk02sIEO91OEShTJp-gSzN_FflJo_ag1jYgb68EJYSSiiEgYRKYWPcfMXTF7RWXUYnJ8Tfwqond90b44uyxf5C6aNmYnJdr5iIWRj4ftTmz8wuvEUbcTQ1-0Qk7g4fi304M7myHb_jYJRW_ihbilmnCScufBcuvc"/>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-white text-sm">Synthetic Dreams</span>
+<span class="text-xs text-zinc-500">Pulse Audio</span>
+</div>
+<button class="material-symbols-outlined text-red-600 ml-2" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</button>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 max-w-xl">
+<div class="flex items-center gap-6">
+<button class="material-symbols-outlined text-zinc-400 hover:text-white" data-icon="shuffle">shuffle</button>
+<button class="material-symbols-outlined text-white hover:text-red-500" data-icon="skip_previous" style="font-variation-settings: 'FILL' 1;">skip_previous</button>
+<button class="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center hover:scale-110 transition-transform shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+<span class="material-symbols-outlined" data-icon="pause" style="font-variation-settings: 'FILL' 1;">pause</span>
+</button>
+<button class="material-symbols-outlined text-white hover:text-red-500" data-icon="skip_next" style="font-variation-settings: 'FILL' 1;">skip_next</button>
+<button class="material-symbols-outlined text-zinc-400 hover:text-white" data-icon="repeat">repeat</button>
+</div>
+<div class="flex items-center gap-3 w-full">
+<span class="text-[10px] text-zinc-500 font-bold">1:24</span>
+<div class="flex-1 h-1 bg-zinc-800 rounded-full overflow-hidden relative group">
+<div class="absolute left-0 top-0 h-full w-[35%] bg-red-600 shadow-[0_0_10px_rgba(255,0,0,0.8)]"></div>
+</div>
+<span class="text-[10px] text-zinc-500 font-bold">3:45</span>
+</div>
+</div>
+<div class="flex items-center justify-end gap-4 w-1/3">
+<button class="material-symbols-outlined text-zinc-400 hover:text-white" data-icon="lyrics">lyrics</button>
+<button class="material-symbols-outlined text-zinc-400 hover:text-white" data-icon="queue_music">queue_music</button>
+<div class="flex items-center gap-2 group w-32">
+<span class="material-symbols-outlined text-zinc-400" data-icon="volume_up">volume_up</span>
+<div class="flex-1 h-1 bg-zinc-800 rounded-full overflow-hidden">
+<div class="h-full w-[70%] bg-zinc-400 group-hover:bg-red-600"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation Anchor (Mobile only) -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pt-3 pb-6 md:hidden bg-[#121212] z-50 rounded-t-2xl border-t border-zinc-800 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+<a class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-['Spline_Sans'] text-[10px] font-bold uppercase mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span class="font-['Spline_Sans'] text-[10px] font-bold uppercase mt-1">Search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-red-600 drop-shadow-[0_0_8px_rgba(255,0,0,0.6)] active:scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="subscriptions" style="font-variation-settings: 'FILL' 1;">subscriptions</span>
+<span class="font-['Spline_Sans'] text-[10px] font-bold uppercase mt-1">Library</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 active:scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="workspace_premium">workspace_premium</span>
+<span class="font-['Spline_Sans'] text-[10px] font-bold uppercase mt-1">Premium</span>
+</a>
+</nav>
+</body></html>

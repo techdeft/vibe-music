@@ -1,0 +1,25 @@
+# Node modules
+vibe-app/node_modules/
+
+# Build artifacts - include dist for WordPress deployment
+# vibe-app/dist/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+
+# Local env
+.env
+.env.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Sample/prototype files (optional)
+# sample/

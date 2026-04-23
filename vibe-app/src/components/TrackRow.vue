@@ -35,12 +35,27 @@
 
     <!-- Duration -->
     <div class="col-dur">{{ track.duration || '—' }}</div>
+
+    <!-- Actions -->
+    <div class="col-actions">
+      <button v-if="auth.isLoggedIn" @click.stop="showPlaylistModal = true" class="action-btn" title="Add to playlist">
+        <span class="material-symbols-outlined">playlist_add</span>
+      </button>
+    </div>
+
+    <AddToPlaylistModal 
+      :is-open="showPlaylistModal" 
+      :track-id="track.id" 
+      @close="showPlaylistModal = false" 
+    />
   </div>
 </template>
 
 <script setup>
 import { computed, ref } from 'vue'
 import { usePlayerStore } from '@/stores/player'
+import { useAuthStore } from '@/stores/auth'
+import AddToPlaylistModal from './AddToPlaylistModal.vue'
 
 const props = defineProps({
   track: { type: Object, required: true },
@@ -51,7 +66,10 @@ const props = defineProps({
 })
 
 const player = usePlayerStore()
+const auth = useAuthStore()
 const hovering = ref(false)
+const showPlaylistModal = ref(false)
+
 const isCurrentTrack = computed(() => player.currentTrack?.id === props.track.id)
 const active = computed(() => isCurrentTrack.value)
 
@@ -67,7 +85,7 @@ function play() {
 <style scoped>
 .track-row {
   display: grid;
-  grid-template-columns: 48px 1fr 1fr 60px;
+  grid-template-columns: 48px 1fr 1fr 60px 48px;
   align-items: center;
   height: 56px;
   padding: 0 16px;
@@ -177,6 +195,29 @@ function play() {
   color: #666;
   text-align: right;
 }
+
+.col-actions {
+  display: flex;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.track-row:hover .col-actions {
+  opacity: 1;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.action-btn:hover { color: #fff; }
 
 .sub-link {
   color: inherit;

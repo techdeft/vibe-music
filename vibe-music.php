@@ -25,6 +25,7 @@ define('VIBE_DIST_URL', VIBE_PLUGIN_URL . 'vibe-app/dist/');
 require_once VIBE_PLUGIN_DIR . 'includes/class-vibe-cpt.php';
 require_once VIBE_PLUGIN_DIR . 'includes/class-vibe-admin.php';
 require_once VIBE_PLUGIN_DIR . 'includes/class-vibe-api.php';
+require_once VIBE_PLUGIN_DIR . 'includes/class-vibe-auth.php';
 require_once VIBE_PLUGIN_DIR . 'includes/class-vibe-frontend.php';
 
 /**
@@ -45,6 +46,10 @@ function vibe_music_init()
     // REST API endpoints
     $api = new Vibe_API();
     $api->register();
+
+    // Auth & Playlist API
+    $auth = new Vibe_Auth();
+    $auth->register();
 
     // Frontend virtual page handler
     $frontend = new Vibe_Frontend();

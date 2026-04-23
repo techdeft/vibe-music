@@ -52,6 +52,16 @@ class Vibe_CPT {
             'show_in_rest'      => true,
             'menu_icon'         => 'dashicons-format-audio',
         ] );
+
+        // PLAYLIST (user-created, managed via REST API)
+        register_post_type( 'vibe_playlist', [
+            'labels'       => $this->get_labels( 'Playlist', 'Playlists' ),
+            'public'       => false,
+            'show_ui'      => false,
+            'show_in_menu' => false,
+            'supports'     => [ 'title', 'author', 'editor' ],
+            'show_in_rest' => false,
+        ] );
     }
 
     // -------------------------------------------------------------------------

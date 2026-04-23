@@ -39,7 +39,6 @@ const auth = useAuthStore()
   background: rgba(18, 18, 18, 0.95);
   backdrop-filter: blur(20px);
   border-top: 1px solid rgba(255, 255, 255, 0.05);
-  display: grid;
   grid-template-columns: repeat(4, 1fr);
   z-index: 1000;
   padding-bottom: env(safe-area-inset-bottom);

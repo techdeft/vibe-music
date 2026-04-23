@@ -225,7 +225,11 @@ class Vibe_Admin {
                 <?php endforeach; ?>
             </h2>
 
-            <div class="vibe-studio-content" style="margin-top: 24px;">
+            <?php if ( isset( $_GET['saved'] ) ) : ?>
+                <div class="notice notice-success is-dismissible" style="margin: 0 0 20px 0;"><p>✅ Saved successfully!</p></div>
+            <?php endif; ?>
+
+            <div class="vibe-studio-content">
                 <?php
                 switch ( $active_tab ) {
                     case 'artists': $this->render_studio_artists(); break;
@@ -270,12 +274,14 @@ class Vibe_Admin {
                     <div class="vibe-form-group">
                         <label>Profile Image</label>
                         <div class="vibe-media-uploader">
-                            <input type="hidden" name="artist_image_id" id="artist_image_id" />
                             <div class="vibe-media-preview" id="artist_image_preview"></div>
-                            <button type="button" class="button" onclick="vibeSelectMedia('Select Artist Image', 'image', function(a){ 
-                                document.getElementById('artist_image_id').value = a.id;
-                                document.getElementById('artist_image_preview').innerHTML = '<img src=\''+a.url+'\' style=\'width:100%;height:100%;object-fit:cover;border-radius:4px;\' />';
-                            })">Choose Image</button>
+                            <div class="vibe-media-actions">
+                                <input type="hidden" name="artist_image_id" id="artist_image_id" />
+                                <button type="button" class="vibe-btn vibe-btn-outline" onclick="vibeSelectMedia('Select Artist Image', 'image', function(a){ 
+                                    document.getElementById('artist_image_id').value = a.id;
+                                    document.getElementById('artist_image_preview').innerHTML = '<img src=\''+a.url+'\' style=\'width:100%;height:100%;object-fit:cover;\' />';
+                                })">Choose Image</button>
+                            </div>
                         </div>
                     </div>
                     <div class="vibe-form-group">
@@ -342,12 +348,14 @@ class Vibe_Admin {
                     <div class="vibe-form-group">
                         <label>Cover Art</label>
                         <div class="vibe-media-uploader">
-                            <input type="hidden" name="album_image_id" id="album_image_id" />
                             <div class="vibe-media-preview" id="album_image_preview"></div>
-                            <button type="button" class="button" onclick="vibeSelectMedia('Select Album Cover', 'image', function(a){ 
-                                document.getElementById('album_image_id').value = a.id;
-                                document.getElementById('album_image_preview').innerHTML = '<img src=\''+a.url+'\' style=\'width:100%;height:100%;object-fit:cover;border-radius:4px;\' />';
-                            })">Choose Cover</button>
+                            <div class="vibe-media-actions">
+                                <input type="hidden" name="album_image_id" id="album_image_id" />
+                                <button type="button" class="vibe-btn vibe-btn-outline" onclick="vibeSelectMedia('Select Album Cover', 'image', function(a){ 
+                                    document.getElementById('album_image_id').value = a.id;
+                                    document.getElementById('album_image_preview').innerHTML = '<img src=\''+a.url+'\' style=\'width:100%;height:100%;object-fit:cover;\' />';
+                                })">Choose Cover</button>
+                            </div>
                         </div>
                     </div>
                     <div class="vibe-form-group">
@@ -464,9 +472,6 @@ class Vibe_Admin {
                     </tbody>
                 </table>
             </div>
-        </div>
-        <?php
-    } </div>
         </div>
         <?php
     }

@@ -408,11 +408,13 @@ class Vibe_Admin {
                     <div class="vibe-form-group">
                         <label>Audio File</label>
                         <div class="vibe-media-uploader">
-                            <input type="text" name="track_audio_url" id="track_audio_url" class="large-text" placeholder="URL or select file" required />
-                            <button type="button" class="button" onclick="vibeSelectMedia('Select Audio File', 'audio', function(a){ 
-                                document.getElementById('track_audio_url').value = a.url;
-                                if (a.caption) { /* handle caption if needed */ }
-                            })">Choose Audio</button>
+                            <div class="vibe-media-preview" id="track_audio_preview"><span class="dashicons dashicons-format-audio" style="font-size:30px;color:#ccc;"></span></div>
+                            <div class="vibe-media-actions" style="flex:1;">
+                                <input type="text" name="track_audio_url" id="track_audio_url" class="large-text" placeholder="URL or select file" required style="margin-bottom:10px;" />
+                                <button type="button" class="vibe-btn vibe-btn-outline" onclick="vibeSelectMedia('Select Audio File', 'audio', function(a){ 
+                                    document.getElementById('track_audio_url').value = a.url;
+                                })">Choose Audio</button>
+                            </div>
                         </div>
                     </div>
                     <div class="vibe-form-group" style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">

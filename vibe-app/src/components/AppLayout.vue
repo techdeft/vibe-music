@@ -1,7 +1,7 @@
 <template>
   <div class="app-shell">
     <!-- Sidebar -->
-    <SideNav />
+    <SideNav class="desktop-sidebar" />
 
     <!-- Main scrollable area -->
     <main class="main-content" ref="mainRef">
@@ -13,12 +13,16 @@
     </main>
 
     <!-- Fixed bottom player -->
-    <MusicPlayer />
+    <MusicPlayer class="global-player" />
+
+    <!-- Mobile Footer Nav -->
+    <MobileNav />
   </div>
 </template>
 
 <script setup>
 import SideNav from './SideNav.vue'
+import MobileNav from './MobileNav.vue'
 import MusicPlayer from './MusicPlayer.vue'
 import { ref } from 'vue'
 
@@ -41,6 +45,19 @@ const mainRef = ref(null)
   grid-row: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-bottom: 8px;
+  padding-bottom: 80px; /* Space for player */
+}
+
+@media (max-width: 768px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+  .desktop-sidebar {
+    display: none;
+  }
+  .main-content {
+    grid-column: 1;
+    padding-bottom: 150px; /* Space for player + mobile nav */
+  }
 }
 </style>

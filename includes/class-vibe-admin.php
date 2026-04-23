@@ -40,10 +40,6 @@ class Vibe_Admin {
         // Studio (Unified Creator)
         add_submenu_page( 'vibe-music', 'VIBE Studio', 'VIBE Studio', 'manage_options', 'vibe-studio', [ $this, 'studio_page' ] );
 
-        // Links to Studio tabs (replacing standard list tables)
-        add_submenu_page( 'vibe-music', 'Artists', 'Artists', 'manage_options', 'vibe-studio&tab=artists', [ $this, 'studio_page' ] );
-        add_submenu_page( 'vibe-music', 'Albums', 'Albums', 'manage_options', 'vibe-studio&tab=albums', [ $this, 'studio_page' ] );
-        add_submenu_page( 'vibe-music', 'Tracks', 'Tracks', 'manage_options', 'vibe-studio&tab=tracks', [ $this, 'studio_page' ] );
 
         // Genres
         add_submenu_page( 'vibe-music', 'Genres', 'Genres', 'manage_options', 'vibe-genres', [ $this, 'genres_page' ] );

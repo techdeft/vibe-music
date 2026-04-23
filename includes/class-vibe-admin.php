@@ -103,6 +103,12 @@ class Vibe_Admin {
                 </div>
             </div>
 
+            <?php if ( ! get_option( 'permalink_structure' ) ) : ?>
+            <div class="notice notice-warning inline" style="margin-bottom: 20px;">
+                <p>⚠️ <strong>Important:</strong> Your site is using "Plain" permalinks. The music player requires a "Pretty" permalink structure (e.g., Post Name) to function. Please update your <a href="<?php echo esc_url( admin_url( 'options-permalink.php' ) ); ?>">Permalink Settings</a>.</p>
+            </div>
+            <?php endif; ?>
+
             <!-- Stats Cards -->
             <div class="vibe-stats-grid">
                 <div class="vibe-stat-card">

@@ -10,14 +10,26 @@ class Vibe_Frontend {
     public function register() {
         add_action( 'init', [ $this, 'add_rewrite_rules' ] );
         add_filter( 'query_vars', [ $this, 'add_query_vars' ] );
-        add_action( 'template_redirect', [ $this, 'handle_virtual_page' ] );
+        add_action( 'template_redirect', [ $this, 'handle_virtual_page' ], 5 ); // Earlier priority
+        add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_assets' ] );
+        add_filter( 'script_loader_tag', [ $this, 'add_module_type' ], 10, 3 );
+    }
+
+    public function add_module_type( $tag, $handle, $src ) {
+        if ( 'vibe-app' !== $handle ) {
+            return $tag;
+        }
+        $tag = '<script type="module" src="' . esc_url( $src ) . '" id="vibe-app-js"></script>';
+        return $tag;
     }
 
     public function add_rewrite_rules() {
         $slug = get_option( 'vibe_slug', 'vibe' );
+        if ( ! $slug ) $slug = 'vibe';
 
-        // Match slug and any sub-paths (for SPA routing)
-        add_rewrite_rule( '^' . preg_quote( $slug, '/' ) . '(/.*)?$', 'index.php?vibe_page=1', 'top' );
+        // More robust rules
+        add_rewrite_rule( $slug . '/?$', 'index.php?vibe_page=1', 'top' );
+        add_rewrite_rule( $slug . '/(.*)/?$', 'index.php?vibe_page=1', 'top' );
     }
 
     public function add_query_vars( $vars ) {
@@ -26,25 +38,52 @@ class Vibe_Frontend {
     }
 
     public function handle_virtual_page() {
-        if ( ! get_query_var( 'vibe_page' ) ) {
+        $slug = get_option( 'vibe_slug', 'vibe' );
+        $is_vibe = get_query_var( 'vibe_page' );
+
+        // Fallback: check Request URI if query var isn't set (sometimes happens with specific permalink setups)
+        if ( ! $is_vibe ) {
+            $request_uri = untrailingslashit( $_SERVER['REQUEST_URI'] );
+            $base_path = untrailingslashit( parse_url( site_url(), PHP_URL_PATH ) );
+            $vibe_path = $base_path . '/' . $slug;
+            
+            if ( strpos( $request_uri, $vibe_path ) === 0 ) {
+                $is_vibe = true;
+            }
+        }
+
+        if ( ! $is_vibe ) {
             return;
         }
 
-        // Enqueue assets
-        $this->enqueue_assets();
+        // Force 200 status
+        status_header( 200 );
 
         // Render the app shell template
         include VIBE_PLUGIN_DIR . 'templates/app-container.php';
         exit;
     }
 
-    private function enqueue_assets() {
-        // Enqueue Vite-built assets
-        $dist_path = VIBE_DIST_DIR;
-        $dist_url  = VIBE_DIST_URL;
+    public function enqueue_assets() {
+        $slug = get_option( 'vibe_slug', 'vibe' );
+        $is_vibe = get_query_var( 'vibe_page' );
 
-        // Try to read the Vite manifest to get hashed filenames
-        $manifest_file = $dist_path . '.vite/manifest.json';
+        // Same fallback check for assets
+        if ( ! $is_vibe ) {
+            $request_uri = untrailingslashit( $_SERVER['REQUEST_URI'] );
+            $base_path = untrailingslashit( parse_url( site_url(), PHP_URL_PATH ) );
+            $vibe_path = $base_path . '/' . $slug;
+            if ( strpos( $request_uri, $vibe_path ) === 0 ) $is_vibe = true;
+        }
+
+        if ( ! $is_vibe ) {
+            return;
+        }
+
+        // Enqueue Vite-built assets
+        $dist_url = VIBE_DIST_URL;
+        $manifest_file = VIBE_DIST_DIR . '.vite/manifest.json';
+        
         $css_file = 'assets/index.css';
         $js_file  = 'assets/index.js';
 
@@ -69,7 +108,7 @@ class Vibe_Frontend {
             'playerName'   => get_option( 'vibe_player_name', 'VIBE' ),
             'tagline'      => get_option( 'vibe_tagline', 'Live the Sound' ),
             'primaryColor' => get_option( 'vibe_primary_color', '#FF0000' ),
-            'slug'         => get_option( 'vibe_slug', 'vibe' ),
+            'slug'         => $slug,
             'allowReg'     => get_option( 'vibe_allow_registration', '0' ) === '1',
         ] );
     }

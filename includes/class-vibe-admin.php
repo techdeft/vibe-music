@@ -89,88 +89,72 @@ class Vibe_Admin {
             'order'       => 'DESC',
         ] );
         ?>
-        <div class="vibe-admin-wrap vibe-dashboard-wrap">
-            <div class="vibe-admin-header">
-                <div class="vibe-logo">
-                    <span class="vibe-logo-text"><?php echo esc_html( $player_name ); ?></span>
-                    <span class="vibe-version">v<?php echo VIBE_VERSION; ?></span>
-                </div>
-                <div class="vibe-header-actions">
-                    <a href="<?php echo esc_url( $site_url ); ?>" target="_blank" class="vibe-btn vibe-btn-outline">
-                        <span class="dashicons dashicons-external"></span> View Player
-                    </a>
-                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=vibe-studio&tab=tracks' ) ); ?>" class="vibe-btn vibe-btn-primary">
-                        <span class="dashicons dashicons-plus"></span> Add Track
-                    </a>
-                </div>
-            </div>
-
-            <?php if ( ! get_option( 'permalink_structure' ) ) : ?>
-            <div class="notice notice-warning inline" style="margin-bottom: 20px;">
-                <p>⚠️ <strong>Important:</strong> Your site is using "Plain" permalinks. The music player requires a "Pretty" permalink structure (e.g., Post Name) to function. Please update your <a href="<?php echo esc_url( admin_url( 'options-permalink.php' ) ); ?>">Permalink Settings</a>.</p>
-            </div>
-            <?php endif; ?>
-
-            <!-- Stats Cards -->
-            <div class="vibe-stats-grid">
-                <div class="vibe-stat-card">
-                    <div class="vibe-stat-icon dashicons dashicons-microphone"></div>
-                    <div class="vibe-stat-content">
-                        <div class="vibe-stat-number"><?php echo esc_html( $artist_count ); ?></div>
-                        <div class="vibe-stat-label">Artists</div>
-                    </div>
-                </div>
-                <div class="vibe-stat-card">
-                    <div class="vibe-stat-icon dashicons dashicons-album"></div>
-                    <div class="vibe-stat-content">
-                        <div class="vibe-stat-number"><?php echo esc_html( $album_count ); ?></div>
-                        <div class="vibe-stat-label">Albums</div>
-                    </div>
-                </div>
-                <div class="vibe-stat-card">
-                    <div class="vibe-stat-icon dashicons dashicons-format-audio"></div>
-                    <div class="vibe-stat-content">
-                        <div class="vibe-stat-number"><?php echo esc_html( $track_count ); ?></div>
-                        <div class="vibe-stat-label">Tracks</div>
-                    </div>
-                </div>
-                <div class="vibe-stat-card">
-                    <div class="vibe-stat-icon dashicons dashicons-admin-links"></div>
-                    <div class="vibe-stat-content">
-                        <div class="vibe-stat-url"><?php echo esc_html( $site_url ); ?></div>
-                        <div class="vibe-stat-label">Player URL</div>
+        <div class="vibe-admin-wrap">
+            <div class="vibe-hero">
+                <div class="vibe-hero-content">
+                    <h1><?php echo esc_html( $player_name ); ?> Dashboard</h1>
+                    <p>Welcome back! Here's what's happening with your music.</p>
+                    <div style="margin-top: 25px; display: flex; gap: 10px;">
+                        <a href="<?php echo esc_url( admin_url( 'admin.php?page=vibe-studio&tab=tracks' ) ); ?>" class="vibe-btn vibe-btn-primary">Add New Track</a>
+                        <a href="<?php echo esc_url( $site_url ); ?>" target="_blank" class="vibe-btn vibe-btn-outline">View Player</a>
                     </div>
                 </div>
             </div>
 
-            <!-- Recent Tracks -->
-            <div class="vibe-card">
-                <h2>Recent Tracks</h2>
-                <table class="vibe-table">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Artist</th>
-                            <th>Album</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ( $recent_tracks as $track ) :
-                            $artist_id   = get_post_meta( $track->ID, '_vibe_track_artist', true );
-                            $album_id    = get_post_meta( $track->ID, '_vibe_track_album', true );
-                        ?>
-                        <tr>
-                            <td><strong><?php echo esc_html( $track->post_title ); ?></strong></td>
-                            <td><?php echo $artist_id ? esc_html( get_the_title( $artist_id ) ) : '—'; ?></td>
-                            <td><?php echo $album_id ? esc_html( get_the_title( $album_id ) ) : '—'; ?></td>
-                            <td>
-                                <a href="<?php echo esc_url( get_edit_post_link( $track->ID ) ); ?>" class="vibe-action-link">Edit</a>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+            <div class="vibe-canvas">
+                <?php if ( ! get_option( 'permalink_structure' ) ) : ?>
+                    <div class="notice notice-warning inline" style="margin-bottom: 30px;"><p>⚠️ <strong>Important:</strong> Pretty permalinks required. Update in <a href="<?php echo admin_url('options-permalink.php'); ?>">Settings</a>.</p></div>
+                <?php endif; ?>
+
+                <div class="vibe-stats-grid">
+                    <div class="vibe-stat-card">
+                        <div class="vibe-stat-icon dashicons dashicons-microphone"></div>
+                        <div class="vibe-stat-content">
+                            <div class="vibe-stat-number"><?php echo esc_html( $artist_count ); ?></div>
+                            <div class="vibe-stat-label">Artists</div>
+                        </div>
+                    </div>
+                    <div class="vibe-stat-card">
+                        <div class="vibe-stat-icon dashicons dashicons-album"></div>
+                        <div class="vibe-stat-content">
+                            <div class="vibe-stat-number"><?php echo esc_html( $album_count ); ?></div>
+                            <div class="vibe-stat-label">Albums</div>
+                        </div>
+                    </div>
+                    <div class="vibe-stat-card">
+                        <div class="vibe-stat-icon dashicons dashicons-format-audio"></div>
+                        <div class="vibe-stat-content">
+                            <div class="vibe-stat-number"><?php echo esc_html( $track_count ); ?></div>
+                            <div class="vibe-stat-label">Tracks</div>
+                        </div>
+                    </div>
+                    <div class="vibe-stat-card">
+                        <div class="vibe-stat-icon dashicons dashicons-admin-links"></div>
+                        <div class="vibe-stat-content">
+                            <div class="vibe-stat-number" style="font-size:12px; word-break:break-all;"><?php echo esc_html( $slug ); ?></div>
+                            <div class="vibe-stat-label">Player Slug</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vibe-card">
+                    <h2><span class="dashicons dashicons-backup"></span> Recent Activity</h2>
+                    <table class="vibe-table">
+                        <thead>
+                            <tr><th>Title</th><th>Type</th><th>Date</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ( $recent_tracks as $track ) : ?>
+                            <tr>
+                                <td><strong><?php echo esc_html( $track->post_title ); ?></strong></td>
+                                <td>Track</td>
+                                <td><?php echo get_the_date( '', $track->ID ); ?></td>
+                                <td><a href="<?php echo get_edit_post_link($track->ID); ?>" class="vibe-action-link">Edit</a></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
         <?php
@@ -183,40 +167,37 @@ class Vibe_Admin {
     public function studio_page() {
         $active_tab = $_GET['tab'] ?? 'artists';
         $tabs = [
-            'artists' => [ 'label' => 'Artists', 'icon' => 'dashicons-microphone' ],
-            'albums'  => [ 'label' => 'Albums',  'icon' => 'dashicons-album' ],
-            'tracks'  => [ 'label' => 'Tracks',  'icon' => 'dashicons-format-audio' ],
+            'artists' => [ 'label' => 'Artists', 'icon' => 'dashicons-microphone', 'desc' => 'Manage your music creators and their profiles.' ],
+            'albums'  => [ 'label' => 'Albums',  'icon' => 'dashicons-album', 'desc' => 'Group tracks into professional albums and EPs.' ],
+            'tracks'  => [ 'label' => 'Tracks',  'icon' => 'dashicons-format-audio', 'desc' => 'Upload and manage your high-quality audio files.' ],
         ];
         ?>
-        <div class="vibe-admin-wrap vibe-studio-container">
-            <!-- Sidebar -->
-            <div class="vibe-studio-sidebar">
-                <div class="vibe-logo">
-                    <span class="vibe-logo-text">VIBE Studio</span>
+        <div class="vibe-admin-wrap">
+            <!-- Hero Canvas Header -->
+            <div class="vibe-hero">
+                <div class="vibe-hero-content">
+                    <h1>VIBE Studio</h1>
+                    <p><?php echo esc_html( $tabs[$active_tab]['desc'] ); ?></p>
                 </div>
-                
-                <nav class="vibe-studio-nav">
-                    <?php foreach ( $tabs as $id => $data ) : ?>
-                        <a href="?page=vibe-studio&tab=<?php echo $id; ?>" class="<?php echo $active_tab === $id ? 'active' : ''; ?>">
-                            <span class="dashicons <?php echo $data['icon']; ?>"></span>
-                            <?php echo esc_html( $data['label'] ); ?>
-                        </a>
-                    <?php endforeach; ?>
-                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=vibe-music' ) ); ?>" style="margin-top:auto; border-top:1px solid rgba(255,255,255,0.1);">
-                        <span class="dashicons dashicons-arrow-left-alt"></span>
-                        Back to Dashboard
-                    </a>
-                </nav>
             </div>
 
-            <!-- Main Content -->
-            <div class="vibe-studio-main">
-                <header class="vibe-studio-header">
-                    <h1><?php echo esc_html( $tabs[$active_tab]['label'] ); ?></h1>
-                    <?php if ( isset( $_GET['saved'] ) ) : ?>
-                        <div class="notice notice-success is-dismissible" style="display:inline-block; margin:0;"><p style="margin:0.2em 0;">✅ Saved successfully!</p></div>
-                    <?php endif; ?>
-                </header>
+            <!-- Floating Tabs -->
+            <nav class="vibe-tabs-floating">
+                <?php foreach ( $tabs as $id => $data ) : ?>
+                    <a href="?page=vibe-studio&tab=<?php echo $id; ?>" class="<?php echo $active_tab === $id ? 'active' : ''; ?>">
+                        <span class="dashicons <?php echo $data['icon']; ?>"></span>
+                        <?php echo esc_html( $data['label'] ); ?>
+                    </a>
+                <?php endforeach; ?>
+                <a href="<?php echo esc_url( admin_url( 'admin.php?page=vibe-music' ) ); ?>" style="margin-left:auto; opacity:0.7;">
+                    <span class="dashicons dashicons-dashboard"></span> Dashboard
+                </a>
+            </nav>
+
+            <div class="vibe-canvas">
+                <?php if ( isset( $_GET['saved'] ) ) : ?>
+                    <div class="notice notice-success is-dismissible" style="margin-bottom: 40px;"><p>✅ Change saved successfully to the database.</p></div>
+                <?php endif; ?>
 
                 <div class="vibe-studio-content">
                     <?php

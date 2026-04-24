@@ -21,7 +21,7 @@
     <!-- Cover + Title -->
     <div class="col-title">
       <img v-if="showCover" :src="track.cover || ''" class="mini-cover" @error="$event.target.style.display='none'" />
-      <div>
+      <div class="title-meta">
         <p class="title" :class="{ 'text-red': isCurrentTrack }">{{ track.title }}</p>
         <p class="subtitle">
           <RouterLink v-if="track.artist_id" :to="`/artist/${track.artist_id}`" class="sub-link" @click.stop>
@@ -48,8 +48,23 @@
 
     <!-- Actions -->
     <div class="col-actions">
-      <button v-if="auth.isLoggedIn" @click.stop="showPlaylistModal = true" class="action-btn" title="Add to playlist">
-        <span class="material-symbols-outlined">playlist_add</span>
+      <button 
+        v-if="auth.isLoggedIn"
+        class="action-btn like-btn" 
+        :class="{ liked: isLiked }"
+        @click.stop="auth.toggleLike(track.id)"
+        title="Like Song"
+      >
+        <span class="material-symbols-outlined">{{ isLiked ? 'favorite' : 'favorite' }}</span>
+      </button>
+      <button class="action-btn" @click.stop="showPlaylistModal = true" title="Add to playlist">
+        <span class="material-symbols-outlined">add</span>
+      </button>
+      <button class="action-btn" @click.stop="handleDownload" title="Download Song">
+        <span class="material-symbols-outlined">download</span>
+      </button>
+      <button class="action-btn" @click.stop="handleShare" title="Share Song">
+        <span class="material-symbols-outlined">share</span>
       </button>
     </div>
 
@@ -65,6 +80,7 @@
 import { computed, ref } from 'vue'
 import { usePlayerStore } from '@/stores/player'
 import { useAuthStore } from '@/stores/auth'
+import { api } from '@/services/api'
 import AddToPlaylistModal from './AddToPlaylistModal.vue'
 
 const props = defineProps({
@@ -80,15 +96,23 @@ const auth = useAuthStore()
 const hovering = ref(false)
 const showPlaylistModal = ref(false)
 
+const isLiked = computed(() => auth.isTrackLiked(props.track.id))
 const isCurrentTrack = computed(() => player.currentTrack?.id === props.track.id)
 const active = computed(() => isCurrentTrack.value)
 
 const gridStyle = computed(() => {
+  const isMobile = window.innerWidth < 768
   let cols = ['48px', '1fr'] // Num, Title
-  if (props.showAlbum) cols.push('1fr')
-  cols.push('100px') // Streams
-  cols.push('60px') // Duration
-  cols.push('48px') // Actions
+  
+  if (isMobile) {
+    cols.push('110px') // Actions
+  } else {
+    if (props.showAlbum) cols.push('1fr')
+    cols.push('100px') // Streams
+    cols.push('60px') // Duration
+    cols.push('110px') // Actions
+  }
+  
   return { gridTemplateColumns: cols.join(' ') }
 })
 
@@ -97,6 +121,55 @@ function play() {
     player.togglePlay()
   } else {
     player.playTrack(props.track, props.queue)
+  }
+}
+
+async function handleShare() {
+  const shareData = {
+    title: props.track.title,
+    text: `Listen to ${props.track.title} by ${props.track.artist_name} on ${api.config.playerName}`,
+    url: window.location.origin + window.location.pathname + `#/album/${props.track.album_id || ''}` // Best fallback for now
+  }
+  
+  try {
+    if (navigator.share) {
+      await navigator.share(shareData)
+    } else {
+      await navigator.clipboard.writeText(shareData.url)
+      alert('Link copied to clipboard!')
+    }
+  } catch (e) {
+    console.error('Share failed:', e)
+  }
+}
+
+async function handleDownload() {
+  if (!props.track.audio_url) return
+  
+  try {
+    const response = await fetch(props.track.audio_url)
+    if (!response.ok) throw new Error('Network response was not ok')
+    const blob = await response.blob()
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.style.display = 'none'
+    a.href = url
+    // Sanitize filename: remove characters not allowed in filenames
+    const safeTitle = props.track.title.replace(/[<>:"/\\|?*]/g, '')
+    const safeArtist = props.track.artist_name.replace(/[<>:"/\\|?*]/g, '')
+    a.download = `${safeArtist} - ${safeTitle}.mp3`
+    
+    document.body.appendChild(a)
+    a.click()
+    
+    setTimeout(() => {
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    }, 100)
+  } catch (e) {
+    console.error('Download failed:', e)
+    // Fallback: open in new window
+    window.open(props.track.audio_url, '_blank')
   }
 }
 
@@ -176,6 +249,14 @@ function formatStreams(n) {
   align-items: center;
   gap: 12px;
   overflow: hidden;
+  min-width: 0;
+}
+
+.title-meta {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
 }
 
 .mini-cover {
@@ -187,7 +268,7 @@ function formatStreams(n) {
 }
 
 .title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: #e5e2e1;
   white-space: nowrap;
@@ -198,12 +279,13 @@ function formatStreams(n) {
 .text-red { color: #FF0000 !important; }
 
 .subtitle {
-  font-size: 12px;
+  font-size: 11px;
   color: #888;
-  margin-top: 2px;
+  margin-top: 0px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.2;
 }
 
 .col-album {
@@ -228,10 +310,18 @@ function formatStreams(n) {
   text-align: right;
 }
 
+@media (max-width: 768px) {
+  .col-album, .col-streams, .col-dur {
+    display: none !important;
+  }
+}
+
 .col-actions {
   display: flex;
-  justify-content: center;
-  opacity: 0;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.4;
   transition: opacity 0.15s;
 }
 
@@ -242,14 +332,33 @@ function formatStreams(n) {
 .action-btn {
   background: none;
   border: none;
-  color: #888;
+  color: #aaa;
   cursor: pointer;
-  padding: 8px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  padding: 3px;
+  border-radius: 50%;
+  transition: all 0.2s;
 }
 
-.action-btn:hover { color: #fff; }
+.action-btn .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.action-btn:hover {
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.like-btn.liked {
+  color: #FF0000;
+  font-variation-settings: 'FILL' 1;
+}
+
+.track-row:hover .action-btn {
+  opacity: 1;
+}
 
 .sub-link {
   color: inherit;

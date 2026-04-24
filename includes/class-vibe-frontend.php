@@ -43,8 +43,8 @@ class Vibe_Frontend {
 
         // Fallback: check Request URI if query var isn't set (sometimes happens with specific permalink setups)
         if ( ! $is_vibe ) {
-            $request_uri = untrailingslashit( $_SERVER['REQUEST_URI'] );
-            $base_path = untrailingslashit( parse_url( site_url(), PHP_URL_PATH ) );
+            $request_uri = untrailingslashit( $_SERVER['REQUEST_URI'] ?? '' );
+            $base_path = untrailingslashit( parse_url( site_url(), PHP_URL_PATH ) ?? '' );
             $vibe_path = $base_path . '/' . $slug;
             
             if ( strpos( $request_uri, $vibe_path ) === 0 ) {
@@ -70,8 +70,8 @@ class Vibe_Frontend {
 
         // Same fallback check for assets
         if ( ! $is_vibe ) {
-            $request_uri = untrailingslashit( $_SERVER['REQUEST_URI'] );
-            $base_path = untrailingslashit( parse_url( site_url(), PHP_URL_PATH ) );
+            $request_uri = untrailingslashit( $_SERVER['REQUEST_URI'] ?? '' );
+            $base_path = untrailingslashit( parse_url( site_url(), PHP_URL_PATH ) ?? '' );
             $vibe_path = $base_path . '/' . $slug;
             if ( strpos( $request_uri, $vibe_path ) === 0 ) $is_vibe = true;
         }

@@ -99,5 +99,9 @@ export const api = {
   deletePlaylist: (id) => del(`/playlists/${id}`),
   addTrackToPlaylist: (id, track_id) => post(`/playlists/${id}/tracks`, { track_id }),
   removeTrackFromPlaylist: (id, track_id) => del(`/playlists/${id}/tracks`, { track_id }),
+
+  // --- Likes ---
+  likeTrack: (id) => post(`/tracks/${id}/like`),
+  getLikedSongs: () => get('/me/liked-songs'),
 }
 

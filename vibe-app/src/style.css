@@ -60,3 +60,13 @@ body {
 .slide-up-enter-active, .slide-up-leave-active { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
 .slide-up-enter-from { opacity: 0; transform: translateY(12px); }
 .slide-up-leave-to { opacity: 0; transform: translateY(-8px); }
+
+/* Responsive Utils */
+@media (max-width: 768px) {
+  .mobile-hide { display: none !important; }
+  
+  /* Global responsive track header */
+  .tracks-header-row {
+    grid-template-columns: 48px 1fr 110px !important;
+  }
+}

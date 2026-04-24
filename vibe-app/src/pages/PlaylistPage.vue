@@ -39,9 +39,9 @@
       <div class="tracks-header-row">
         <span class="th th-num">#</span>
         <span class="th">Title</span>
-        <span class="th">Album</span>
-        <span class="th th-dur"><span class="material-symbols-outlined" style="font-size:16px">schedule</span></span>
-        <span v-if="isOwner" class="th th-action"></span>
+        <span class="th mobile-hide">Album</span>
+        <span class="th th-dur mobile-hide"><span class="material-symbols-outlined" style="font-size:16px">schedule</span></span>
+        <span class="th"></span>
       </div>
       <div class="divider"></div>
 
@@ -280,7 +280,7 @@ watch(() => route.params.id, load)
 
 .tracks-header-row {
   display: grid;
-  grid-template-columns: 48px 1fr 1fr 60px 48px;
+  grid-template-columns: 48px 1fr 1fr 60px 110px;
   padding: 0 16px;
   margin-bottom: 6px;
 }
@@ -295,6 +295,12 @@ watch(() => route.params.id, load)
   display: grid;
   grid-template-columns: 1fr 48px;
   align-items: center;
+}
+
+@media (max-width: 768px) {
+  .track-row-wrap {
+    grid-template-columns: 1fr 32px;
+  }
 }
 
 .remove-track-btn {

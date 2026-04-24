@@ -38,6 +38,7 @@ const routes = [
       { path: 'genre/:slug', name: 'genre', component: () => import('@/pages/GenrePage.vue') },
       { path: 'library', name: 'library', component: () => import('@/pages/LibraryPage.vue') },
       { path: 'playlist/:id', name: 'playlist', component: () => import('@/pages/PlaylistPage.vue') },
+      { path: 'liked-songs', name: 'liked-songs', component: () => import('@/pages/LikedSongsPage.vue') },
     ]
   }
 ]

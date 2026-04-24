@@ -61,6 +61,8 @@ class Vibe_CPT {
             'show_in_menu' => false,
             'supports'     => [ 'title', 'author', 'editor' ],
             'show_in_rest' => false,
+            'capability_type' => 'vibe_playlist',
+            'map_meta_cap'    => true,
         ] );
     }
 

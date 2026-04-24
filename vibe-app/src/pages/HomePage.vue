@@ -52,9 +52,10 @@
         <div class="tracks-header-row">
           <span class="th th-num">#</span>
           <span class="th">Title</span>
-          <span class="th">Album</span>
-          <span class="th th-streams">Plays</span>
-          <span class="th th-dur"><span class="material-symbols-outlined" style="font-size:16px">schedule</span></span>
+          <span class="th mobile-hide">Album</span>
+          <span class="th th-streams mobile-hide">Plays</span>
+          <span class="th th-dur mobile-hide"><span class="material-symbols-outlined" style="font-size:16px">schedule</span></span>
+          <span class="th"></span>
         </div>
         <div class="divider"></div>
         <TrackRow
@@ -392,18 +393,20 @@ function genreColor(slug) {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.2;
 }
 
 .album-artist {
-  font-size: 12px;
+  font-size: 11px;
   color: #888;
-  margin-top: 2px;
+  margin-top: 0px;
+  line-height: 1.2;
 }
 
 /* Track list header */
 .tracks-header-row {
   display: grid;
-  grid-template-columns: 48px 1fr 1fr 100px 60px;
+  grid-template-columns: 48px 1fr 1fr 100px 60px 110px;
   padding: 0 16px;
   margin-bottom: 6px;
 }

@@ -98,6 +98,20 @@ class Vibe_Auth {
                 'permission_callback' => [ $this, 'can_edit_playlist' ],
             ],
         ] );
+        
+        // --- LIKES ---
+        register_rest_route( self::NAMESPACE, '/tracks/(?P<id>\d+)/like', [
+            'methods'             => 'POST',
+            'callback'            => [ $this, 'toggle_like' ],
+            'permission_callback' => [ $this, 'is_logged_in' ],
+        ] );
+
+        // Liked Songs list
+        register_rest_route( self::NAMESPACE, '/me/liked-songs', [
+            'methods'             => 'GET',
+            'callback'            => [ $this, 'get_liked_songs' ],
+            'permission_callback' => [ $this, 'is_logged_in' ],
+        ] );
     }
 
     // -------------------------------------------------------------------------
@@ -236,6 +250,7 @@ class Vibe_Auth {
             'post_type'   => 'vibe_playlist',
             'author'      => $user_id,
             'numberposts' => -1,
+            'post_status' => [ 'publish', 'private' ],
             'orderby'     => 'date',
             'order'       => 'DESC',
         ] );
@@ -322,6 +337,61 @@ class Vibe_Auth {
         return rest_ensure_response( $this->format_playlist( get_post( $post_id ), true ) );
     }
 
+    public function toggle_like( $request ) {
+        $user_id  = get_current_user_id();
+        $track_id = absint( $request['id'] );
+
+        if ( get_post_type( $track_id ) !== 'vibe_track' ) {
+            return new WP_Error( 'invalid_track', 'Invalid track ID.', [ 'status' => 400 ] );
+        }
+
+        $liked_tracks = get_user_meta( $user_id, '_vibe_liked_tracks', true ) ?: [];
+        $is_liked     = in_array( $track_id, $liked_tracks );
+
+        $likes_count = (int) get_post_meta( $track_id, '_vibe_likes_count', true );
+
+        if ( $is_liked ) {
+            // Unlike
+            $liked_tracks = array_values( array_filter( $liked_tracks, fn( $id ) => $id != $track_id ) );
+            $likes_count  = max( 0, $likes_count - 1 );
+            $liked        = false;
+        } else {
+            // Like
+            $liked_tracks[] = $track_id;
+            $likes_count++;
+            $liked          = true;
+        }
+
+        update_user_meta( $user_id, '_vibe_liked_tracks', $liked_tracks );
+        update_post_meta( $track_id, '_vibe_likes_count', $likes_count );
+
+        return rest_ensure_response( [
+            'success'      => true,
+            'liked'        => $liked,
+            'likes_count'  => $likes_count,
+            'liked_tracks' => $liked_tracks,
+        ] );
+    }
+
+    public function get_liked_songs( $request ) {
+        $user_id      = get_current_user_id();
+        $liked_tracks = get_user_meta( $user_id, '_vibe_liked_tracks', true ) ?: [];
+        
+        if ( empty( $liked_tracks ) ) {
+            return rest_ensure_response( [] );
+        }
+
+        $posts = get_posts( [
+            'post_type'   => 'vibe_track',
+            'post__in'    => $liked_tracks,
+            'numberposts' => -1,
+            'orderby'     => 'post__in',
+        ] );
+
+        $api = new Vibe_API();
+        return rest_ensure_response( array_map( [ $api, 'format_track' ], $posts ) );
+    }
+
     public function remove_track_from_playlist( $request ) {
         $post_id  = absint( $request['id'] );
         $track_id = absint( $request->get_param( 'track_id' ) ?? 0 );
@@ -345,6 +415,7 @@ class Vibe_Auth {
             'email'        => $user->user_email,
             'avatar'       => get_avatar_url( $user->ID, [ 'size' => 96 ] ),
             'is_admin'     => user_can( $user->ID, 'manage_options' ),
+            'liked_tracks' => get_user_meta( $user->ID, '_vibe_liked_tracks', true ) ?: [],
         ];
     }
 
@@ -360,7 +431,7 @@ class Vibe_Auth {
             'author_id'    => (int) $post->post_author,
             'author_name'  => $author ? $author->display_name : 'Unknown',
             'track_count'  => count( $tracks_ids ),
-            'cover'        => $this->get_playlist_cover( $tracks_ids ),
+            'cover'        => $this->get_playlist_cover( $tracks_ids ) ?: '',
             'created_at'   => $post->post_date,
         ];
 
@@ -390,13 +461,13 @@ class Vibe_Auth {
         return [
             'id'          => $post->ID,
             'title'       => $post->post_title,
-            'audio_url'   => get_post_meta( $post->ID, '_vibe_track_audio_url', true ),
-            'cover'       => $album_id ? $this->get_featured_image( $album_id ) : $this->get_featured_image( $post->ID ),
-            'duration'    => get_post_meta( $post->ID, '_vibe_track_duration', true ),
+            'audio_url'   => get_post_meta( $post->ID, '_vibe_track_audio_url', true ) ?: '',
+            'cover'       => ( $album_id ? $this->get_featured_image( $album_id ) : $this->get_featured_image( $post->ID ) ) ?: '',
+            'duration'    => get_post_meta( $post->ID, '_vibe_track_duration', true ) ?: '',
             'artist_id'   => (int) $artist_id,
-            'artist_name' => $artist_id ? get_the_title( $artist_id ) : null,
+            'artist_name' => $artist_id ? get_the_title( $artist_id ) : '',
             'album_id'    => (int) $album_id,
-            'album_title' => $album_id ? get_the_title( $album_id ) : null,
+            'album_title' => $album_id ? get_the_title( $album_id ) : '',
         ];
     }
 
@@ -411,13 +482,13 @@ class Vibe_Auth {
             $src = $this->get_featured_image( $track_id );
             if ( $src ) return $src;
         }
-        return null;
+        return '';
     }
 
     private function get_featured_image( $post_id ) {
         $thumb_id = get_post_thumbnail_id( $post_id );
-        if ( ! $thumb_id ) return null;
+        if ( ! $thumb_id ) return '';
         $src = wp_get_attachment_image_src( $thumb_id, 'large' );
-        return $src ? $src[0] : null;
+        return $src ? $src[0] : '';
     }
 }

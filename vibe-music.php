@@ -54,6 +54,9 @@ function vibe_music_init()
     // Frontend virtual page handler
     $frontend = new Vibe_Frontend();
     $frontend->register();
+
+    // Ensure subscriber caps are granted
+    vibe_grant_subscriber_caps();
 }
 add_action('plugins_loaded', 'vibe_music_init');
 
@@ -73,6 +76,27 @@ function vibe_music_activate()
     }
     if (!get_option('vibe_player_name')) {
         update_option('vibe_player_name', 'VIBE');
+    }
+    if (get_option('vibe_allow_registration') === false) {
+        update_option('vibe_allow_registration', '1');
+    }
+
+    // Grant capabilities
+    vibe_grant_subscriber_caps();
+}
+
+/**
+ * Grant playlist capabilities to subscribers
+ */
+function vibe_grant_subscriber_caps() {
+    $role = get_role('subscriber');
+    if ($role) {
+        $role->add_cap('edit_vibe_playlists');
+        $role->add_cap('publish_vibe_playlists');
+        $role->add_cap('delete_vibe_playlists');
+        $role->add_cap('read_vibe_playlist');
+        $role->add_cap('edit_published_vibe_playlists');
+        $role->add_cap('delete_published_vibe_playlists');
     }
 }
 register_activation_hook(__FILE__, 'vibe_music_activate');

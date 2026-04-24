@@ -26,7 +26,15 @@
           <span v-else>{{ player.currentTrack.artist_name || 'Unknown' }}</span>
         </p>
       </div>
-      <div class="track-meta" v-else>
+      <button 
+        v-if="player.currentTrack && auth.isLoggedIn" 
+        class="player-like-btn" 
+        :class="{ liked: isLiked }"
+        @click="auth.toggleLike(player.currentTrack.id)"
+      >
+        <span class="material-symbols-outlined">{{ isLiked ? 'favorite' : 'favorite' }}</span>
+      </button>
+      <div class="track-meta" v-else-if="!player.currentTrack">
         <p class="track-title" style="color:#444">Nothing playing</p>
       </div>
     </div>
@@ -73,6 +81,12 @@
       <button class="ctrl-btn-sm" title="Add to queue">
         <span class="material-symbols-outlined">queue_music</span>
       </button>
+      <button v-if="player.currentTrack" class="ctrl-btn-sm" @click="handleDownload" title="Download">
+        <span class="material-symbols-outlined">download</span>
+      </button>
+      <button v-if="player.currentTrack" class="ctrl-btn-sm" @click="handleShare" title="Share">
+        <span class="material-symbols-outlined">share</span>
+      </button>
       <div class="volume-control">
         <span class="material-symbols-outlined" style="font-size:18px;color:#888">{{ player.volume === 0 ? 'volume_off' : 'volume_up' }}</span>
         <input
@@ -88,9 +102,65 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { usePlayerStore } from '@/stores/player'
+import { useAuthStore } from '@/stores/auth'
+import { api } from '@/services/api'
 
 const player = usePlayerStore()
+const auth = useAuthStore()
+
+const isLiked = computed(() => {
+  if (!player.currentTrack) return false
+  return auth.isTrackLiked(player.currentTrack.id)
+})
+
+async function handleShare() {
+  if (!player.currentTrack) return
+  const shareData = {
+    title: player.currentTrack.title,
+    text: `Listen to ${player.currentTrack.title} by ${player.currentTrack.artist_name} on ${api.config.playerName}`,
+    url: window.location.origin + window.location.pathname + `#/album/${player.currentTrack.album_id || ''}`
+  }
+  
+  try {
+    if (navigator.share) {
+      await navigator.share(shareData)
+    } else {
+      await navigator.clipboard.writeText(shareData.url)
+      alert('Link copied to clipboard!')
+    }
+  } catch (e) {
+    console.error('Share failed:', e)
+  }
+}
+
+async function handleDownload() {
+  const track = player.currentTrack
+  if (!track || !track.audio_url) return
+  
+  try {
+    const response = await fetch(track.audio_url)
+    if (!response.ok) throw new Error('Network response was not ok')
+    const blob = await response.blob()
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.style.display = 'none'
+    a.href = url
+    const safeTitle = track.title.replace(/[<>:"/\\|?*]/g, '')
+    const safeArtist = track.artist_name.replace(/[<>:"/\\|?*]/g, '')
+    a.download = `${safeArtist} - ${safeTitle}.mp3`
+    document.body.appendChild(a)
+    a.click()
+    setTimeout(() => {
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    }, 100)
+  } catch (e) {
+    console.error('Download failed:', e)
+    window.open(track.audio_url, '_blank')
+  }
+}
 
 function handleSeek(e) {
   const rect = e.currentTarget.getBoundingClientRect()
@@ -124,6 +194,22 @@ function handleSeek(e) {
 .track-artist { font-size: 11px; color: #888; margin-top: 2px; }
 .artist-link { color: #888; text-decoration: none; }
 .artist-link:hover { color: #FF0000; text-decoration: underline; }
+
+.player-like-btn {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+.player-like-btn:hover { color: #fff; transform: scale(1.1); }
+.player-like-btn.liked {
+  color: #FF0000;
+  font-variation-settings: 'FILL' 1;
+}
 
 .controls { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .control-buttons { display: flex; align-items: center; gap: 16px; }

@@ -20,6 +20,10 @@
         <span class="material-symbols-outlined">library_music</span>
         <span>Your Library</span>
       </RouterLink>
+      <RouterLink v-if="auth.isLoggedIn" to="/liked-songs" class="nav-item" :class="{ active: $route.name === 'liked-songs' }">
+        <span class="material-symbols-outlined">favorite</span>
+        <span>Liked Songs</span>
+      </RouterLink>
     </nav>
 
     <!-- User Section -->

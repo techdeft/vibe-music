@@ -78,8 +78,28 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = ''
   }
 
+  function isTrackLiked(trackId) {
+    if (!user.value?.liked_tracks) return false
+    return user.value.liked_tracks.includes(Number(trackId))
+  }
+
+  async function toggleLike(trackId) {
+    if (!isLoggedIn.value) return false
+    try {
+      const res = await api.likeTrack(trackId)
+      if (res.success && user.value) {
+        user.value.liked_tracks = res.liked_tracks
+        return true
+      }
+    } catch (e) {
+      console.error('Failed to toggle like:', e)
+    }
+    return false
+  }
+
   return {
     user, loading, error, isLoggedIn, isAdmin,
     fetchMe, login, register, logout, forgotPassword, clearError,
+    isTrackLiked, toggleLike,
   }
 })

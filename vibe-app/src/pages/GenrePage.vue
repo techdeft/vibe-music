@@ -23,8 +23,9 @@
         <div class="tracks-header-row">
           <span class="th th-num">#</span>
           <span class="th">Title</span>
-          <span class="th">Album</span>
-          <span class="th th-dur"><span class="material-symbols-outlined" style="font-size:16px">schedule</span></span>
+          <span class="th mobile-hide">Album</span>
+          <span class="th th-dur mobile-hide"><span class="material-symbols-outlined" style="font-size:16px">schedule</span></span>
+          <span class="th"></span>
         </div>
         <div class="divider"></div>
         <TrackRow
@@ -156,7 +157,7 @@ watch(() => route.params.slug, load)
 
 .tracks-header-row {
   display: grid;
-  grid-template-columns: 48px 1fr 1fr 60px;
+  grid-template-columns: 48px 1fr 1fr 60px 110px;
   padding: 0 16px;
   margin-bottom: 6px;
 }

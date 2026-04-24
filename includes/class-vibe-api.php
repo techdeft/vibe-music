@@ -302,9 +302,9 @@ class Vibe_API {
             'name'              => $post->post_title,
             'bio'               => get_post_meta( $post->ID, '_vibe_artist_bio', true ),
             'monthly_listeners' => (int) get_post_meta( $post->ID, '_vibe_artist_monthly_listeners', true ),
-            'image'             => $this->get_featured_image( $post->ID ),
-            'spotify_url'       => get_post_meta( $post->ID, '_vibe_artist_spotify', true ),
-            'instagram_url'     => get_post_meta( $post->ID, '_vibe_artist_instagram', true ),
+            'image'             => $this->get_featured_image( $post->ID ) ?: '',
+            'spotify_url'       => get_post_meta( $post->ID, '_vibe_artist_spotify', true ) ?: '',
+            'instagram_url'     => get_post_meta( $post->ID, '_vibe_artist_instagram', true ) ?: '',
             'featured'          => get_post_meta( $post->ID, '_vibe_artist_featured', true ) === '1',
         ];
     }
@@ -318,10 +318,10 @@ class Vibe_API {
         return [
             'id'           => $post->ID,
             'title'        => $post->post_title,
-            'cover'        => $this->get_featured_image( $post->ID ),
-            'release_date' => get_post_meta( $post->ID, '_vibe_album_release_date', true ),
+            'cover'        => $this->get_featured_image( $post->ID ) ?: '',
+            'release_date' => get_post_meta( $post->ID, '_vibe_album_release_date', true ) ?: '',
             'artist_id'    => (int) $artist_id,
-            'artist_name'  => $artist_id ? get_the_title( $artist_id ) : null,
+            'artist_name'  => $artist_id ? get_the_title( $artist_id ) : '',
             'genres'       => $this->format_genres( wp_get_post_terms( $post->ID, 'vibe_genre' ) ),
             'featured'     => get_post_meta( $post->ID, '_vibe_album_featured', true ) === '1',
         ];
@@ -334,21 +334,31 @@ class Vibe_API {
     private function format_track( $post ) {
         $artist_id = get_post_meta( $post->ID, '_vibe_track_artist', true );
         $album_id  = get_post_meta( $post->ID, '_vibe_track_album', true );
+        $user_id   = get_current_user_id();
+        $is_liked  = false;
+        
+        if ( $user_id ) {
+            $liked_tracks = get_user_meta( $user_id, '_vibe_liked_tracks', true ) ?: [];
+            $is_liked     = in_array( $post->ID, $liked_tracks );
+        }
+
         return [
             'id'          => $post->ID,
             'title'       => $post->post_title,
-            'audio_url'   => get_post_meta( $post->ID, '_vibe_track_audio_url', true ),
-            'cover'       => $album_id ? $this->get_featured_image( $album_id ) : $this->get_featured_image( $post->ID ),
-            'duration'    => get_post_meta( $post->ID, '_vibe_track_duration', true ),
+            'audio_url'   => get_post_meta( $post->ID, '_vibe_track_audio_url', true ) ?: '',
+            'cover'       => ( $album_id ? $this->get_featured_image( $album_id ) : $this->get_featured_image( $post->ID ) ) ?: '',
+            'duration'    => get_post_meta( $post->ID, '_vibe_track_duration', true ) ?: '',
             'track_number'=> (int) get_post_meta( $post->ID, '_vibe_track_number', true ),
             'artist_id'   => (int) $artist_id,
-            'artist_name' => $artist_id ? get_the_title( $artist_id ) : null,
+            'artist_name' => $artist_id ? get_the_title( $artist_id ) : '',
             'album_id'    => (int) $album_id,
-            'album_title' => $album_id ? get_the_title( $album_id ) : null,
-            'lyrics'      => get_post_meta( $post->ID, '_vibe_track_lyrics', true ),
+            'album_title' => $album_id ? get_the_title( $album_id ) : '',
+            'lyrics'      => get_post_meta( $post->ID, '_vibe_track_lyrics', true ) ?: '',
             'genres'      => $this->format_genres( wp_get_post_terms( $post->ID, 'vibe_genre' ) ),
             'featured'    => get_post_meta( $post->ID, '_vibe_track_featured', true ) === '1',
             'streams'     => (int) get_post_meta( $post->ID, '_vibe_stream_count', true ),
+            'likes'       => (int) get_post_meta( $post->ID, '_vibe_likes_count', true ),
+            'liked'       => $is_liked,
         ];
     }
 
@@ -369,8 +379,8 @@ class Vibe_API {
 
     private function get_featured_image( $post_id, $size = 'large' ) {
         $thumb_id = get_post_thumbnail_id( $post_id );
-        if ( ! $thumb_id ) return null;
+        if ( ! $thumb_id ) return '';
         $src = wp_get_attachment_image_src( $thumb_id, $size );
-        return $src ? $src[0] : null;
+        return $src ? $src[0] : '';
     }
 }

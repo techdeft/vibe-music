@@ -332,15 +332,27 @@ class Vibe_API {
     }
 
     private function format_track( $post ) {
-        $artist_id = get_post_meta( $post->ID, '_vibe_track_artist', true );
-        $album_id  = get_post_meta( $post->ID, '_vibe_track_album', true );
-        $user_id   = get_current_user_id();
-        $is_liked  = false;
+        $artist_ids = get_post_meta( $post->ID, '_vibe_track_artist' );
+        $album_id   = get_post_meta( $post->ID, '_vibe_track_album', true );
+        $user_id    = get_current_user_id();
+        $is_liked   = false;
         
         if ( $user_id ) {
             $liked_tracks = get_user_meta( $user_id, '_vibe_liked_tracks', true ) ?: [];
             $is_liked     = in_array( $post->ID, $liked_tracks );
         }
+
+        $artists = [];
+        foreach ( $artist_ids as $aid ) {
+            $artists[] = [
+                'id'   => (int) $aid,
+                'name' => get_the_title( $aid ),
+            ];
+        }
+
+        // Primary artist for backward compatibility
+        $primary_artist_id   = ! empty( $artist_ids ) ? (int) $artist_ids[0] : 0;
+        $primary_artist_name = ! empty( $artists ) ? $artists[0]['name'] : '';
 
         return [
             'id'          => $post->ID,
@@ -349,8 +361,9 @@ class Vibe_API {
             'cover'       => ( $album_id ? $this->get_featured_image( $album_id ) : $this->get_featured_image( $post->ID ) ) ?: '',
             'duration'    => get_post_meta( $post->ID, '_vibe_track_duration', true ) ?: '',
             'track_number'=> (int) get_post_meta( $post->ID, '_vibe_track_number', true ),
-            'artist_id'   => (int) $artist_id,
-            'artist_name' => $artist_id ? get_the_title( $artist_id ) : '',
+            'artist_id'   => $primary_artist_id,
+            'artist_name' => $primary_artist_name,
+            'artists'     => $artists,
             'album_id'    => (int) $album_id,
             'album_title' => $album_id ? get_the_title( $album_id ) : '',
             'lyrics'      => get_post_meta( $post->ID, '_vibe_track_lyrics', true ) ?: '',

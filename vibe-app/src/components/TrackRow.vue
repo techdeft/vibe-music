@@ -24,10 +24,19 @@
       <div class="title-meta">
         <p class="title" :class="{ 'text-red': isCurrentTrack }">{{ track.title }}</p>
         <p class="subtitle">
-          <RouterLink v-if="track.artist_id" :to="`/artist/${track.artist_id}`" class="sub-link" @click.stop>
-            {{ track.artist_name }}
-          </RouterLink>
-          <span v-else>{{ track.artist_name || 'Unknown' }}</span>
+          <template v-if="track.artists && track.artists.length">
+            <template v-for="(artist, index) in track.artists" :key="artist.id">
+              <RouterLink :to="`/artist/${artist.id}`" class="sub-link" @click.stop>
+                {{ artist.name }}
+              </RouterLink><span v-if="index < track.artists.length - 1">, </span>
+            </template>
+          </template>
+          <template v-else>
+            <RouterLink v-if="track.artist_id" :to="`/artist/${track.artist_id}`" class="sub-link" @click.stop>
+              {{ track.artist_name }}
+            </RouterLink>
+            <span v-else>{{ track.artist_name || 'Unknown' }}</span>
+          </template>
         </p>
       </div>
     </div>
@@ -127,7 +136,7 @@ function play() {
 async function handleShare() {
   const shareData = {
     title: props.track.title,
-    text: `Listen to ${props.track.title} by ${props.track.artist_name} on ${api.config.playerName}`,
+    text: `Listen to ${props.track.title} by ${props.track.artists?.map(a => a.name).join(', ') || props.track.artist_name} on ${api.config.playerName}`,
     url: window.location.origin + window.location.pathname + `#/album/${props.track.album_id || ''}` // Best fallback for now
   }
   
@@ -156,7 +165,8 @@ async function handleDownload() {
     a.href = url
     // Sanitize filename: remove characters not allowed in filenames
     const safeTitle = props.track.title.replace(/[<>:"/\\|?*]/g, '')
-    const safeArtist = props.track.artist_name.replace(/[<>:"/\\|?*]/g, '')
+    const artistNames = props.track.artists?.map(a => a.name).join(', ') || props.track.artist_name
+    const safeArtist = artistNames.replace(/[<>:"/\\|?*]/g, '')
     a.download = `${safeArtist} - ${safeTitle}.mp3`
     
     document.body.appendChild(a)

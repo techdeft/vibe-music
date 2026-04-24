@@ -399,7 +399,7 @@ class Vibe_Admin {
         $is_edit = $edit_post && $edit_post->post_type === 'vibe_track';
 
         $audio_url = $is_edit ? get_post_meta( $edit_post->ID, '_vibe_track_audio_url', true ) : '';
-        $artist_id = $is_edit ? get_post_meta( $edit_post->ID, '_vibe_track_artist', true ) : '';
+        $artist_ids = $is_edit ? get_post_meta( $edit_post->ID, '_vibe_track_artist' ) : [];
         $album_id  = $is_edit ? get_post_meta( $edit_post->ID, '_vibe_track_album', true ) : '';
         $duration  = $is_edit ? get_post_meta( $edit_post->ID, '_vibe_track_duration', true ) : '';
         $lyrics    = $is_edit ? get_post_meta( $edit_post->ID, '_vibe_track_lyrics', true ) : '';
@@ -450,14 +450,17 @@ class Vibe_Admin {
                         </div>
                     </div>
                     <div class="vibe-form-group" style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <div>
-                            <label>Artist</label>
-                            <select name="track_artist" required class="large-text">
-                                <option value="">— Select Artist —</option>
+                        <div style="grid-column: span 2;">
+                            <label>Artist(s)</label>
+                            <div class="vibe-checkbox-list" style="max-height: 200px; overflow-y: auto; border: 1.5px solid var(--vibe-border); padding: 15px; background: #fcfcfc; border-radius: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
                                 <?php foreach ( $artists as $a ) : ?>
-                                    <option value="<?php echo $a->ID; ?>" <?php selected( $artist_id, $a->ID ); ?>><?php echo esc_html( $a->post_title ); ?></option>
+                                    <label style="display: flex; align-items: center; gap: 8px; font-weight: 500; cursor: pointer;">
+                                        <input type="checkbox" name="track_artist[]" value="<?php echo $a->ID; ?>" <?php echo in_array( $a->ID, $artist_ids ) ? 'checked' : ''; ?> style="width: auto !important; margin: 0;" />
+                                        <?php echo esc_html( $a->post_title ); ?>
+                                    </label>
                                 <?php endforeach; ?>
-                            </select>
+                            </div>
+                            <p class="description" style="margin-top: 8px;">Select all contributors for this track.</p>
                         </div>
                         <div>
                             <label>Album (optional)</label>
@@ -501,13 +504,21 @@ class Vibe_Admin {
                     <thead><tr><th>Title</th><th>Artist</th><th>Album</th><th>Streams</th><th>Actions</th></tr></thead>
                     <tbody>
                         <?php foreach ( $tracks as $track ) : 
-                            $artist_id = get_post_meta( $track->ID, '_vibe_track_artist', true );
                             $album_id  = get_post_meta( $track->ID, '_vibe_track_album', true );
                             $streams   = (int) get_post_meta( $track->ID, '_vibe_stream_count', true );
                         ?>
                         <tr>
                             <td><strong><?php echo esc_html( $track->post_title ); ?></strong></td>
-                            <td><?php echo $artist_id ? esc_html( get_the_title( $artist_id ) ) : '—'; ?></td>
+                            <td>
+                                <?php 
+                                $t_artist_ids = get_post_meta( $track->ID, '_vibe_track_artist' );
+                                $names = [];
+                                foreach ( $t_artist_ids as $tid ) {
+                                    $names[] = get_the_title( $tid );
+                                }
+                                echo ! empty( $names ) ? esc_html( implode( ', ', $names ) ) : '—';
+                                ?>
+                            </td>
                             <td><?php echo $album_id ? esc_html( get_the_title( $album_id ) ) : '—'; ?></td>
                             <td><span class="vibe-badge"><?php echo number_format( $streams ); ?></span></td>
                             <td><a href="?page=vibe-studio&tab=tracks&edit=<?php echo $track->ID; ?>" class="vibe-action-link">Edit</a></td>
@@ -810,7 +821,14 @@ class Vibe_Admin {
 
         if ( $track_id ) {
             update_post_meta( $track_id, '_vibe_track_audio_url', esc_url_raw( $_POST['track_audio_url'] ?? '' ) );
-            update_post_meta( $track_id, '_vibe_track_artist', absint( $_POST['track_artist'] ?? 0 ) );
+            
+            // Multiple Artists
+            delete_post_meta( $track_id, '_vibe_track_artist' );
+            $artist_ids = isset( $_POST['track_artist'] ) ? (array) $_POST['track_artist'] : [];
+            foreach ( $artist_ids as $aid ) {
+                if ( $aid ) add_post_meta( $track_id, '_vibe_track_artist', absint( $aid ) );
+            }
+
             update_post_meta( $track_id, '_vibe_track_album', absint( $_POST['track_album'] ?? 0 ) );
             update_post_meta( $track_id, '_vibe_track_duration', sanitize_text_field( $_POST['track_duration'] ?? '' ) );
             update_post_meta( $track_id, '_vibe_track_lyrics', sanitize_textarea_field( $_POST['track_lyrics'] ?? '' ) );

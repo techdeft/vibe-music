@@ -18,12 +18,21 @@
       <div class="track-meta" v-if="player.currentTrack">
         <p class="track-title">{{ player.currentTrack.title }}</p>
         <p class="track-artist">
-          <RouterLink
-            v-if="player.currentTrack.artist_id"
-            :to="`/artist/${player.currentTrack.artist_id}`"
-            class="artist-link"
-          >{{ player.currentTrack.artist_name }}</RouterLink>
-          <span v-else>{{ player.currentTrack.artist_name || 'Unknown' }}</span>
+          <template v-if="player.currentTrack.artists && player.currentTrack.artists.length">
+            <template v-for="(artist, index) in player.currentTrack.artists" :key="artist.id">
+              <RouterLink :to="`/artist/${artist.id}`" class="artist-link">
+                {{ artist.name }}
+              </RouterLink><span v-if="index < player.currentTrack.artists.length - 1">, </span>
+            </template>
+          </template>
+          <template v-else>
+            <RouterLink
+              v-if="player.currentTrack.artist_id"
+              :to="`/artist/${player.currentTrack.artist_id}`"
+              class="artist-link"
+            >{{ player.currentTrack.artist_name }}</RouterLink>
+            <span v-else>{{ player.currentTrack.artist_name || 'Unknown' }}</span>
+          </template>
         </p>
       </div>
       <button 
@@ -119,7 +128,7 @@ async function handleShare() {
   if (!player.currentTrack) return
   const shareData = {
     title: player.currentTrack.title,
-    text: `Listen to ${player.currentTrack.title} by ${player.currentTrack.artist_name} on ${api.config.playerName}`,
+    text: `Listen to ${player.currentTrack.title} by ${player.currentTrack.artists?.map(a => a.name).join(', ') || player.currentTrack.artist_name} on ${api.config.playerName}`,
     url: window.location.origin + window.location.pathname + `#/album/${player.currentTrack.album_id || ''}`
   }
   
@@ -148,7 +157,8 @@ async function handleDownload() {
     a.style.display = 'none'
     a.href = url
     const safeTitle = track.title.replace(/[<>:"/\\|?*]/g, '')
-    const safeArtist = track.artist_name.replace(/[<>:"/\\|?*]/g, '')
+    const artistNames = track.artists?.map(a => a.name).join(', ') || track.artist_name
+    const safeArtist = artistNames.replace(/[<>:"/\\|?*]/g, '')
     a.download = `${safeArtist} - ${safeTitle}.mp3`
     document.body.appendChild(a)
     a.click()

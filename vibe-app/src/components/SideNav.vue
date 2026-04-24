@@ -91,7 +91,14 @@
       />
       <div class="np-info">
         <p class="np-title">{{ player.currentTrack.title }}</p>
-        <p class="np-artist">{{ player.currentTrack.artist_name || 'Unknown' }}</p>
+        <p class="np-artist">
+          <template v-if="player.currentTrack.artists && player.currentTrack.artists.length">
+            {{ player.currentTrack.artists.map(a => a.name).join(', ') }}
+          </template>
+          <template v-else>
+            {{ player.currentTrack.artist_name || 'Unknown' }}
+          </template>
+        </p>
       </div>
       <button @click="player.togglePlay()" class="np-btn">
         <span class="material-symbols-outlined filled">{{ player.isPlaying ? 'pause' : 'play_arrow' }}</span>

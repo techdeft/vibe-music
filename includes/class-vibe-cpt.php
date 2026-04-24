@@ -145,6 +145,7 @@ class Vibe_CPT {
         $release_date   = get_post_meta( $post->ID, '_vibe_album_release_date', true );
         $featured       = get_post_meta( $post->ID, '_vibe_album_featured', true );
         $artists        = get_posts( [ 'post_type' => 'vibe_artist', 'numberposts' => -1, 'orderby' => 'title', 'order' => 'ASC' ] );
+        $artist_ids     = get_post_meta( $post->ID, '_vibe_album_artist' );
         ?>
         <table class="vibe-meta-table">
             <tr>
@@ -186,14 +187,21 @@ class Vibe_CPT {
         ?>
         <table class="vibe-meta-table">
             <tr>
-                <td width="150"><label><strong>Artist</strong></label></td>
+                <td width="150"><label><strong>Artist(s)</strong></label></td>
                 <td>
-                    <select name="vibe_track_artist" style="width:100%">
-                        <option value="">— Select Artist —</option>
+                    <?php 
+                    $selected_artists = get_post_meta( $post->ID, '_vibe_track_artist' );
+                    if ( empty( $selected_artists ) && ! empty( $artist_id ) ) $selected_artists = [ $artist_id ];
+                    ?>
+                    <div style="max-height: 150px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: #f9f9f9; border-radius: 4px;">
                         <?php foreach ( $artists as $artist ) : ?>
-                            <option value="<?php echo $artist->ID; ?>" <?php selected( $artist_id, $artist->ID ); ?>><?php echo esc_html( $artist->post_title ); ?></option>
+                            <label style="display: block; margin-bottom: 5px;">
+                                <input type="checkbox" name="vibe_track_artist[]" value="<?php echo $artist->ID; ?>" <?php echo in_array( $artist->ID, $selected_artists ) ? 'checked' : ''; ?> />
+                                <?php echo esc_html( $artist->post_title ); ?>
+                            </label>
                         <?php endforeach; ?>
-                    </select>
+                    </div>
+                    <p class="description">Select all artists that contributed to this track.</p>
                 </td>
             </tr>
             <tr>
@@ -274,7 +282,13 @@ class Vibe_CPT {
         }
 
         if ( $post_type === 'vibe_track' && isset( $_POST['vibe_track_nonce'] ) && wp_verify_nonce( $_POST['vibe_track_nonce'], 'vibe_track_meta' ) ) {
-            update_post_meta( $post_id, '_vibe_track_artist', absint( $_POST['vibe_track_artist'] ?? 0 ) );
+            // Support multiple artists
+            delete_post_meta( $post_id, '_vibe_track_artist' );
+            $artist_ids = isset( $_POST['vibe_track_artist'] ) ? (array) $_POST['vibe_track_artist'] : [];
+            foreach ( $artist_ids as $aid ) {
+                if ( $aid ) add_post_meta( $post_id, '_vibe_track_artist', absint( $aid ) );
+            }
+            
             update_post_meta( $post_id, '_vibe_track_album', absint( $_POST['vibe_track_album'] ?? 0 ) );
             update_post_meta( $post_id, '_vibe_track_audio_url', esc_url_raw( $_POST['vibe_track_audio_url'] ?? '' ) );
             update_post_meta( $post_id, '_vibe_track_duration', sanitize_text_field( $_POST['vibe_track_duration'] ?? '' ) );

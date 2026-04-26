@@ -17,6 +17,9 @@
 
     <!-- Mobile Footer Nav -->
     <MobileNav />
+
+    <!-- Full Screen Player -->
+    <FullPlayer />
   </div>
 </template>
 
@@ -24,6 +27,7 @@
 import SideNav from './SideNav.vue'
 import MobileNav from './MobileNav.vue'
 import MusicPlayer from './MusicPlayer.vue'
+import FullPlayer from './FullPlayer.vue'
 import { ref } from 'vue'
 
 const mainRef = ref(null)

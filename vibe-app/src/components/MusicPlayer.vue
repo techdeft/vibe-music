@@ -1,7 +1,7 @@
 <template>
   <footer class="player-bar" v-if="player.currentTrack || true">
     <!-- Track Info -->
-    <div class="track-info">
+    <div class="track-info" @click="player.toggleFullPlayer()" style="cursor: pointer;">
       <div class="track-cover-wrap">
         <img
           v-if="player.currentTrack"
@@ -90,6 +90,9 @@
       <button class="ctrl-btn-sm" title="Add to queue">
         <span class="material-symbols-outlined">queue_music</span>
       </button>
+      <button v-if="player.currentTrack?.video_url" class="ctrl-btn-sm" :class="{ active: player.isFullPlayerOpen }" @click="player.toggleFullPlayer()" title="Watch Video">
+        <span class="material-symbols-outlined">smart_display</span>
+      </button>
       <button v-if="player.currentTrack" class="ctrl-btn-sm" @click="handleDownload" title="Download">
         <span class="material-symbols-outlined">download</span>
       </button>
@@ -122,6 +125,14 @@ const auth = useAuthStore()
 const isLiked = computed(() => {
   if (!player.currentTrack) return false
   return auth.isTrackLiked(player.currentTrack.id)
+})
+
+const youtubeId = computed(() => {
+  const url = player.currentTrack?.video_url
+  if (!url) return null
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
+  const match = url.match(regExp)
+  return (match && match[2].length === 11) ? match[2] : null
 })
 
 async function handleShare() {
@@ -275,4 +286,6 @@ function handleSeek(e) {
   .track-cover, .track-cover-empty { width: 44px; height: 44px; }
   .controls { flex-direction: row; gap: 12px; }
 }
+
+.ctrl-btn-sm.active { color: #FF0000; }
 </style>

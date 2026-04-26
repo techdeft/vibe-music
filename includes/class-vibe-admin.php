@@ -434,6 +434,19 @@ class Vibe_Admin {
                         </div>
                     </div>
                     <div class="vibe-form-group">
+                        <label>Video URL (YouTube or File)</label>
+                        <div class="vibe-media-uploader">
+                            <div class="vibe-media-preview" id="track_video_preview"><span class="dashicons dashicons-video-alt3" style="font-size:30px;color:#ccc;"></span></div>
+                            <div class="vibe-media-actions" style="flex:1;">
+                                <?php $video_url = $is_edit ? get_post_meta( $edit_post->ID, '_vibe_track_video_url', true ) : ''; ?>
+                                <input type="text" name="track_video_url" id="track_video_url" class="large-text" placeholder="YouTube URL or select video file" style="margin-bottom:10px;" value="<?php echo esc_attr( $video_url ); ?>" />
+                                <button type="button" class="vibe-btn vibe-btn-outline" onclick="vibeSelectMedia('Select Video File', 'video', function(a){ 
+                                    document.getElementById('track_video_url').value = a.url;
+                                })">Choose Video</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="vibe-form-group">
                         <label>Track Cover (Optional)</label>
                         <p class="description" style="margin-bottom:10px;">Overrides album cover for this track only.</p>
                         <div class="vibe-media-uploader">
@@ -821,6 +834,7 @@ class Vibe_Admin {
 
         if ( $track_id ) {
             update_post_meta( $track_id, '_vibe_track_audio_url', esc_url_raw( $_POST['track_audio_url'] ?? '' ) );
+            update_post_meta( $track_id, '_vibe_track_video_url', esc_url_raw( $_POST['track_video_url'] ?? '' ) );
             
             // Multiple Artists
             delete_post_meta( $track_id, '_vibe_track_artist' );

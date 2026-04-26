@@ -16,6 +16,8 @@ export const usePlayerStore = defineStore('player', () => {
   const duration = ref(0)
   const currentTime = ref(0)
   const isLoading = ref(false)
+  const showVideo = ref(false)
+  const isFullPlayerOpen = ref(false)
 
   let howl = null
   let progressInterval = null
@@ -205,6 +207,14 @@ export const usePlayerStore = defineStore('player', () => {
     }
   }
 
+  function toggleVideo() {
+    showVideo.value = !showVideo.value
+  }
+
+  function toggleFullPlayer() {
+    isFullPlayerOpen.value = !isFullPlayerOpen.value
+  }
+
   function formatTime(secs) {
     const m = Math.floor(secs / 60)
     const s = Math.floor(secs % 60)
@@ -214,7 +224,8 @@ export const usePlayerStore = defineStore('player', () => {
   return {
     queue, currentIndex, currentTrack, isPlaying, isShuffle, repeatMode,
     volume, progress, duration, currentTime, isLoading, hasNext, hasPrev,
+    showVideo, isFullPlayerOpen,
     playTrack, togglePlay, next, prev, seek, setVolume, toggleShuffle,
-    toggleRepeat, addToQueue, formatTime,
+    toggleRepeat, addToQueue, formatTime, toggleVideo, toggleFullPlayer,
   }
 })

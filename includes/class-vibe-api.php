@@ -358,6 +358,7 @@ class Vibe_API {
             'id'          => $post->ID,
             'title'       => $post->post_title,
             'audio_url'   => get_post_meta( $post->ID, '_vibe_track_audio_url', true ) ?: '',
+            'video_url'   => get_post_meta( $post->ID, '_vibe_track_video_url', true ) ?: '',
             'cover'       => ( $album_id ? $this->get_featured_image( $album_id ) : $this->get_featured_image( $post->ID ) ) ?: '',
             'duration'    => get_post_meta( $post->ID, '_vibe_track_duration', true ) ?: '',
             'track_number'=> (int) get_post_meta( $post->ID, '_vibe_track_number', true ),

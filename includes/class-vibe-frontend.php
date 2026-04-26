@@ -110,6 +110,7 @@ class Vibe_Frontend {
             'primaryColor' => get_option( 'vibe_primary_color', '#FF0000' ),
             'slug'         => $slug,
             'allowReg'     => get_option( 'vibe_allow_registration', '0' ) === '1',
+            'donationLink' => get_option( 'vibe_donation_link', '' ),
         ] );
     }
 }

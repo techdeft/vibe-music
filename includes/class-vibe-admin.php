@@ -629,6 +629,7 @@ class Vibe_Admin {
         $tagline     = get_option( 'vibe_tagline', 'Live the Sound' );
         $primary_color = get_option( 'vibe_primary_color', '#FF0000' );
         $allow_reg   = get_option( 'vibe_allow_registration', '0' );
+        $donation_link = get_option( 'vibe_donation_link', '' );
         $saved       = isset( $_GET['saved'] ) && $_GET['saved'] === '1';
         ?>
         <div class="vibe-admin-wrap">
@@ -667,6 +668,10 @@ class Vibe_Admin {
                             <div class="vibe-form-group">
                                 <label for="vibe_tagline">Tagline</label>
                                 <input type="text" id="vibe_tagline" name="vibe_tagline" value="<?php echo esc_attr( $tagline ); ?>" />
+                            </div>
+                            <div class="vibe-form-group">
+                                <label for="vibe_donation_link">Donation Link (Optional)</label>
+                                <input type="url" id="vibe_donation_link" name="vibe_donation_link" value="<?php echo esc_attr( $donation_link ); ?>" placeholder="https://paypal.me/yourname" />
                             </div>
                         </div>
 
@@ -709,6 +714,7 @@ class Vibe_Admin {
         update_option( 'vibe_slug', $slug );
         update_option( 'vibe_player_name', sanitize_text_field( $_POST['vibe_player_name'] ?? 'VIBE' ) );
         update_option( 'vibe_tagline', sanitize_text_field( $_POST['vibe_tagline'] ?? 'Live the Sound' ) );
+        update_option( 'vibe_donation_link', esc_url_raw( $_POST['vibe_donation_link'] ?? '' ) );
         update_option( 'vibe_primary_color', sanitize_hex_color( $_POST['vibe_primary_color'] ?? '#FF0000' ) );
         update_option( 'vibe_allow_registration', isset( $_POST['vibe_allow_registration'] ) ? '1' : '0' );
 

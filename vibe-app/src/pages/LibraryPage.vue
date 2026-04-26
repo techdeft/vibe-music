@@ -78,7 +78,7 @@
         <p>Create playlists, follow artists, and more by logging in.</p>
         <div class="upsell-actions">
           <RouterLink to="/login" class="btn-login">Log In</RouterLink>
-          <!-- <RouterLink to="/register" class="btn-signup">Sign Up Free</RouterLink> -->
+          
         </div>
       </div>
     </div>

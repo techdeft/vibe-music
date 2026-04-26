@@ -81,6 +81,14 @@
       </div>
     </div>
 
+    <!-- Donate Section -->
+    <div class="donate-section" v-if="donationLink">
+      <a :href="donationLink" target="_blank" class="donate-btn">
+        <span class="material-symbols-outlined">volunteer_activism</span>
+        <span>Support the Artist</span>
+      </a>
+    </div>
+
     <!-- Now Playing mini -->
     <div class="now-playing" v-if="player.currentTrack">
       <img
@@ -140,6 +148,7 @@ const playlistStore = usePlaylistStore()
 const genres = ref([])
 const playerName = api.config.playerName || 'VIBE'
 const tagline = api.config.tagline || 'Live the Sound'
+const donationLink = api.config.donationLink || ''
 
 const showCreateModal = ref(false)
 const newPlaylistName = ref('')
@@ -411,6 +420,35 @@ async function handleCreatePlaylist() {
 
 .genre-pill:hover { border-color: #FF0000; color: #FF0000; }
 .genre-pill.active { background: #FF0000; border-color: #FF0000; color: #fff; }
+
+/* Donate Section */
+.donate-section {
+  padding: 12px 16px;
+  border-top: 1px solid #1A1A1A;
+}
+
+.donate-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #FF0000 0%, #cc0000 100%);
+  color: #fff;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px;
+  border-radius: 10px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.2);
+}
+
+.donate-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 0, 0, 0.4);
+}
+
+.donate-btn .material-symbols-outlined { font-size: 18px; }
 
 /* Now Playing mini */
 .now-playing {

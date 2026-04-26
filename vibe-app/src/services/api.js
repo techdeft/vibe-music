@@ -5,6 +5,7 @@ const config = window.VibeConfig || {
   playerName: 'VIBE',
   tagline: 'Live the Sound',
   primaryColor: '#FF0000',
+  donationLink: '',
 }
 
 let currentNonce = config.nonce || ''

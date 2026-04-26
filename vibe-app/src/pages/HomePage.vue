@@ -536,4 +536,21 @@ function genreColor(slug) {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+@media (max-width: 768px) {
+  .hero { height: 280px; }
+  .hero-name { font-size: 38px; }
+  .hero-content { padding: 24px 20px; }
+  .content-area { padding: 0 16px 40px; }
+  .tracks-header-row { display: none; }
+  .card-scroll, .genre-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  .artists-row { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+}
+
+@media (max-width: 480px) {
+  .hero { height: 240px; }
+  .hero-name { font-size: 32px; }
+  .btn-play-hero { padding: 10px 20px; font-size: 14px; }
+  .btn-view { padding: 9px 18px; font-size: 13px; }
+}
 </style>

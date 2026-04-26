@@ -316,4 +316,20 @@ const playlistStore = usePlaylistStore()
 
 .btn-login:hover, .btn-signup:hover { transform: scale(1.04); }
 .btn-signup:hover { border-color: #fff; }
+
+@media (max-width: 768px) {
+  .library-page { padding: 24px 16px; }
+  .page-header { margin-bottom: 30px; }
+  .page-title { font-size: 28px; }
+  .playlists-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; }
+  .playlist-card { padding: 12px; }
+  .tracks-header-row { display: none; }
+  .auth-upsell { padding: 40px 24px; }
+}
+
+@media (max-width: 480px) {
+  .upsell-actions { flex-direction: column; gap: 12px; }
+  .btn-login, .btn-signup { width: 100%; text-align: center; padding: 12px 20px; }
+  .upsell-content h3 { font-size: 22px; }
+}
 </style>

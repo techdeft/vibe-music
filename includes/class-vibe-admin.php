@@ -630,6 +630,7 @@ class Vibe_Admin {
         $primary_color = get_option( 'vibe_primary_color', '#FF0000' );
         $allow_reg   = get_option( 'vibe_allow_registration', '0' );
         $donation_link = get_option( 'vibe_donation_link', '' );
+        $is_home     = get_option( 'vibe_is_home', '0' );
         $saved       = isset( $_GET['saved'] ) && $_GET['saved'] === '1';
         ?>
         <div class="vibe-admin-wrap">
@@ -659,6 +660,12 @@ class Vibe_Admin {
                                 <div class="vibe-slug-input" style="display:flex; align-items:center; background:#fcfcfc; border:1.5px solid #eee; border-radius:12px; overflow:hidden;">
                                     <span style="padding:10px 15px; background:#eee; color:#666; font-size:12px; border-right:1px solid #ddd;"><?php echo esc_html( site_url( '/' ) ); ?></span>
                                     <input type="text" id="vibe_slug" name="vibe_slug" value="<?php echo esc_attr( $slug ); ?>" style="border:none !important; border-radius:0 !important; flex:1;" />
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:12px; color:#666;">
+                                        <input type="checkbox" name="vibe_is_home" value="1" <?php checked( $is_home, '1' ); ?> style="width:auto !important;" />
+                                        <span>Use as Site Home Page (Root URL)</span>
+                                    </label>
                                 </div>
                             </div>
                             <div class="vibe-form-group">
@@ -717,6 +724,7 @@ class Vibe_Admin {
         update_option( 'vibe_donation_link', esc_url_raw( $_POST['vibe_donation_link'] ?? '' ) );
         update_option( 'vibe_primary_color', sanitize_hex_color( $_POST['vibe_primary_color'] ?? '#FF0000' ) );
         update_option( 'vibe_allow_registration', isset( $_POST['vibe_allow_registration'] ) ? '1' : '0' );
+        update_option( 'vibe_is_home', isset( $_POST['vibe_is_home'] ) ? '1' : '0' );
 
         flush_rewrite_rules();
         wp_redirect( admin_url( 'admin.php?page=vibe-settings&saved=1' ) );

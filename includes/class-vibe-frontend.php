@@ -38,21 +38,7 @@ class Vibe_Frontend {
     }
 
     public function handle_virtual_page() {
-        $slug = get_option( 'vibe_slug', 'vibe' );
-        $is_vibe = get_query_var( 'vibe_page' );
-
-        // Fallback: check Request URI if query var isn't set (sometimes happens with specific permalink setups)
-        if ( ! $is_vibe ) {
-            $request_uri = untrailingslashit( $_SERVER['REQUEST_URI'] ?? '' );
-            $base_path = untrailingslashit( (string) parse_url( site_url(), PHP_URL_PATH ) );
-            $vibe_path = $base_path . '/' . $slug;
-            
-            if ( strpos( $request_uri, $vibe_path ) === 0 ) {
-                $is_vibe = true;
-            }
-        }
-
-        if ( ! $is_vibe ) {
+        if ( ! $this->is_vibe_request() ) {
             return;
         }
 
@@ -64,19 +50,35 @@ class Vibe_Frontend {
         exit;
     }
 
-    public function enqueue_assets() {
+    private function is_vibe_request() {
         $slug = get_option( 'vibe_slug', 'vibe' );
-        $is_vibe = get_query_var( 'vibe_page' );
+        $is_home_opt = get_option( 'vibe_is_home', '0' ) === '1';
 
-        // Same fallback check for assets
-        if ( ! $is_vibe ) {
-            $request_uri = untrailingslashit( $_SERVER['REQUEST_URI'] ?? '' );
-            $base_path = untrailingslashit( (string) parse_url( site_url(), PHP_URL_PATH ) );
-            $vibe_path = $base_path . '/' . $slug;
-            if ( strpos( $request_uri, $vibe_path ) === 0 ) $is_vibe = true;
+        // Check query var
+        if ( get_query_var( 'vibe_page' ) ) return true;
+
+        // Check if home page override is enabled
+        if ( $is_home_opt && ( is_front_page() || is_home() ) ) {
+             // Ensure it's not a REST request or something else
+             if ( strpos( $_SERVER['REQUEST_URI'] ?? '', 'wp-json' ) === false ) {
+                 return true;
+             }
         }
 
-        if ( ! $is_vibe ) {
+        // Check slug in URI
+        $request_uri = untrailingslashit( $_SERVER['REQUEST_URI'] ?? '' );
+        $base_path = untrailingslashit( (string) parse_url( site_url(), PHP_URL_PATH ) );
+        $vibe_path = $base_path . '/' . $slug;
+        
+        if ( $slug && strpos( $request_uri, $vibe_path ) === 0 ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function enqueue_assets() {
+        if ( ! $this->is_vibe_request() ) {
             return;
         }
 

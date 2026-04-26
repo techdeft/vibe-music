@@ -101,6 +101,8 @@ class Vibe_Frontend {
         wp_enqueue_style( 'vibe-app', $dist_url . $css_file, [], VIBE_VERSION );
         wp_enqueue_script( 'vibe-app', $dist_url . $js_file, [], VIBE_VERSION, true );
 
+        $slug = get_option( 'vibe_slug', 'vibe' );
+
         // Localize config for the Vue app
         wp_localize_script( 'vibe-app', 'VibeConfig', [
             'apiBase'      => esc_url( rest_url( 'vibe-music/v1' ) ),

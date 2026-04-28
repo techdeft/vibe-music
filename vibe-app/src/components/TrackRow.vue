@@ -9,7 +9,7 @@
   >
     <!-- Number / Play indicator -->
     <div class="col-num">
-      <span v-if="!hovering && !isCurrentTrack" class="track-num">{{ number }}</span>
+      <span v-if="!hovering && !isCurrentTrack" class="track-num"></span>
       <button v-else class="play-icon-btn" @click="play">
         <span class="material-symbols-outlined filled">{{ isCurrentTrack && player.isPlaying ? 'pause' : 'play_arrow' }}</span>
       </button>
@@ -196,7 +196,7 @@ function formatStreams(n) {
   display: grid;
   align-items: center;
   height: 56px;
-  padding: 0 16px;
+  /* padding: 0 16px; */
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.1s;

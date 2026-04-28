@@ -44,7 +44,7 @@
     <!-- Track List -->
     <div class="tracks-section" v-if="album.tracks?.length">
       <div class="tracks-header-row">
-        <span class="th th-num">#</span>
+        <span class="th th-num"></span>
         <span class="th">Title</span>
         <span class="th th-streams mobile-hide">Plays</span>
         <span class="th th-dur mobile-hide"><span class="material-symbols-outlined" style="font-size:16px">schedule</span></span>

@@ -43,7 +43,7 @@
       <h2 class="section-title">Current Queue</h2>
       <div v-if="player.queue.length" class="queue-list">
         <div class="tracks-header-row">
-          <span class="th th-num">#</span>
+          <span class="th th-num"></span>
           <span class="th">Title</span>
           <span class="th">Album</span>
           <span class="th th-streams">Plays</span>

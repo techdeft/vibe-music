@@ -28,7 +28,7 @@
     <!-- Track List -->
     <div class="tracks-section" v-if="tracks.length">
       <div class="tracks-header-row">
-        <span class="th th-num">#</span>
+        <span class="th th-num"></span>
         <span class="th">Title</span>
         <span class="th mobile-hide">Album</span>
         <span class="th th-streams mobile-hide">Plays</span>

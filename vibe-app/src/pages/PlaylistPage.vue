@@ -37,7 +37,7 @@
     <!-- Track List -->
     <div class="tracks-section" v-if="playlist.tracks?.length">
       <div class="tracks-header-row">
-        <span class="th th-num">#</span>
+        <span class="th th-num"></span>
         <span class="th">Title</span>
         <span class="th mobile-hide">Album</span>
         <span class="th th-dur mobile-hide"><span class="material-symbols-outlined" style="font-size:16px">schedule</span></span>

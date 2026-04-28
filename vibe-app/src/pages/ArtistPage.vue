@@ -37,7 +37,7 @@
       <section v-if="artist.top_tracks?.length" class="section">
         <h2 class="section-title">Popular</h2>
         <div class="tracks-header-row">
-          <span class="th th-num">#</span>
+          <span class="th th-num"></span>
           <span class="th">Title</span>
           <span class="th mobile-hide">Album</span>
           <span class="th th-streams mobile-hide">Plays</span>

@@ -50,7 +50,7 @@
           <h2 class="section-title">Trending Now</h2>
         </div>
         <div class="tracks-header-row">
-          <span class="th th-num">#</span>
+          <span class="th th-num"></span>
           <span class="th">Title</span>
           <span class="th mobile-hide">Album</span>
           <span class="th th-streams mobile-hide">Plays</span>
@@ -74,7 +74,7 @@
           <h2 class="section-title">Recently Added</h2>
         </div>
         <div class="tracks-header-row">
-          <span class="th th-num">#</span>
+          <span class="th th-num"></span>
           <span class="th">Title</span>
           <span class="th">Album</span>
           <span class="th th-streams">Plays</span>

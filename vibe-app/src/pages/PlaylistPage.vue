@@ -205,7 +205,7 @@ watch(() => route.params.id, load)
   font-size: 80px;
 }
 
-.playlist-info { flex: 1; }
+.playlist-info { flex: 1; min-width: 0; }
 
 .type-badge {
   font-size: 12px;
@@ -217,12 +217,14 @@ watch(() => route.params.id, load)
 
 .playlist-name {
   font-family: 'Spline Sans', sans-serif;
-  font-size: 64px;
+  font-size: 72px;
   font-weight: 900;
   color: #fff;
-  line-height: 1.1;
-  letter-spacing: -2px;
+  line-height: 1;
+  letter-spacing: -3px;
   margin-bottom: 12px;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .playlist-meta {
@@ -297,12 +299,6 @@ watch(() => route.params.id, load)
   align-items: center;
 }
 
-@media (max-width: 768px) {
-  .track-row-wrap {
-    grid-template-columns: 1fr 32px;
-  }
-}
-
 .remove-track-btn {
   background: none;
   border: none;
@@ -361,6 +357,57 @@ watch(() => route.params.id, load)
   border-top-color: #FF0000;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
+}
+
+@media (max-width: 768px) {
+  .playlist-header {
+    padding-top: 40px;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 20px;
+    padding: 20px 24px;
+  }
+  
+  .playlist-cover-wrap {
+    width: 192px;
+    height: 192px;
+  }
+  
+  .playlist-name {
+    font-size: 32px;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+  }
+  
+  .playlist-meta {
+    justify-content: center;
+    font-size: 12px;
+  }
+  
+  .action-bar {
+    padding: 16px 24px;
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  .tracks-section {
+    padding: 0 12px 32px;
+  }
+  
+  .tracks-header-row {
+    grid-template-columns: 40px 1fr 1fr;
+    padding: 0 8px;
+  }
+  
+  .track-row-wrap {
+    grid-template-columns: 1fr 32px;
+  }
+  
+  .mobile-hide { display: none; }
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }

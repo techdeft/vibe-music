@@ -3,7 +3,7 @@
  * Plugin Name: VIBE Music
  * Plugin URI:  https://vibe.music
  * Description: A premium Spotify-like music streaming plugin for WordPress. Manage artists, albums, tracks & stream music with a beautiful, modern UI.
- * Version:     1.0.1
+ * Version:     1.0.2
  * Author:      Immtech Global
  * Text Domain: vibe-music
  * License:     GPL v2 or later
@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin Constants
-define('VIBE_VERSION', '1.0.1');
+define('VIBE_VERSION', '1.0.2');
 define('VIBE_PLUGIN_FILE', __FILE__);
 define('VIBE_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('VIBE_PLUGIN_URL', plugin_dir_url(__FILE__));

@@ -49,23 +49,14 @@
         <div class="section-header">
           <h2 class="section-title">Trending Now</h2>
         </div>
-        <div class="tracks-header-row">
-          <span class="th th-num"></span>
-          <span class="th">Title</span>
-          <span class="th mobile-hide">Album</span>
-          <span class="th th-streams mobile-hide">Plays</span>
-          <span class="th th-dur mobile-hide"><span class="material-symbols-outlined" style="font-size:16px">schedule</span></span>
-          <span class="th"></span>
+        <div class="horizontal-scroll">
+          <TrackCard
+            v-for="track in discovery.trending_tracks"
+            :key="track.id"
+            :track="track"
+            :queue="discovery.trending_tracks"
+          />
         </div>
-        <div class="divider"></div>
-        <TrackRow
-          v-for="(track, i) in discovery.trending_tracks"
-          :key="track.id"
-          :track="track"
-          :number="i + 1"
-          :queue="discovery.trending_tracks"
-          show-cover
-        />
       </section>
 
       <!-- Recent Tracks -->
@@ -152,6 +143,7 @@ import { ref, computed, onMounted } from 'vue'
 import { api } from '@/services/api'
 import { usePlayerStore } from '@/stores/player'
 import TrackRow from '@/components/TrackRow.vue'
+import TrackCard from '@/components/TrackCard.vue'
 
 const player = usePlayerStore()
 const discovery = ref({})
@@ -324,7 +316,21 @@ function genreColor(slug) {
   color: #fff;
 }
 
-/* Album cards */
+/* Track/Album horizontal scroll */
+.horizontal-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 24px;
+  padding-bottom: 24px;
+  margin-bottom: -24px;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+
+.horizontal-scroll::-webkit-scrollbar {
+  display: none;
+}
+
 .card-scroll {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));

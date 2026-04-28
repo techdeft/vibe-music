@@ -76,15 +76,27 @@
       >
         <span class="material-symbols-outlined">{{ isLiked ? 'favorite' : 'favorite' }}</span>
       </button>
-      <button class="action-btn" @click.stop="showPlaylistModal = true" title="Add to playlist">
-        <span class="material-symbols-outlined">add</span>
-      </button>
-      <button class="action-btn" @click.stop="handleDownload" title="Download Song">
-        <span class="material-symbols-outlined">download</span>
-      </button>
-      <button class="action-btn" @click.stop="handleShare" title="Share Song">
-        <span class="material-symbols-outlined">share</span>
-      </button>
+
+      <div class="more-menu-wrap" @click.stop>
+        <button class="action-btn more-btn" @click="showDropdown = !showDropdown" title="More options">
+          <span class="material-symbols-outlined">more_horiz</span>
+        </button>
+        
+        <div v-if="showDropdown" class="dropdown-menu">
+          <button class="dropdown-item" @click="handleAddToPlaylist">
+            <span class="material-symbols-outlined">add</span>
+            Add to playlist
+          </button>
+          <button class="dropdown-item" @click="handleDownload">
+            <span class="material-symbols-outlined">download</span>
+            Download
+          </button>
+          <button class="dropdown-item" @click="handleShare">
+            <span class="material-symbols-outlined">share</span>
+            Share
+          </button>
+        </div>
+      </div>
     </div>
 
     <AddToPlaylistModal 
@@ -96,7 +108,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { usePlayerStore } from '@/stores/player'
 import { useAuthStore } from '@/stores/auth'
 import { api } from '@/services/api'
@@ -115,6 +127,7 @@ const player = usePlayerStore()
 const auth = useAuthStore()
 const hovering = ref(false)
 const showPlaylistModal = ref(false)
+const showDropdown = ref(false)
 
 const isLiked = computed(() => auth.isTrackLiked(props.track.id))
 const isCurrentTrack = computed(() => player.currentTrack?.id === props.track.id)
@@ -128,16 +141,23 @@ const gridStyle = computed(() => {
   cols.push('1fr') // Title
   
   if (isMobile) {
-    cols.push('110px') // Actions
+    cols.push('80px') // Reduced for Like + More
   } else {
     if (props.showAlbum) cols.push('1fr')
     cols.push('100px') // Streams
     cols.push('60px') // Duration
-    cols.push('110px') // Actions
+    cols.push('80px') // Actions
   }
   
   return { gridTemplateColumns: cols.join(' ') }
 })
+
+function closeDropdown(e) {
+  if (showDropdown.value) showDropdown.value = false
+}
+
+onMounted(() => window.addEventListener('click', closeDropdown))
+onUnmounted(() => window.removeEventListener('click', closeDropdown))
 
 function play() {
   if (isCurrentTrack.value) {
@@ -147,11 +167,17 @@ function play() {
   }
 }
 
+function handleAddToPlaylist() {
+  showPlaylistModal.value = true
+  showDropdown.value = false
+}
+
 async function handleShare() {
+  showDropdown.value = false
   const shareData = {
     title: props.track.title,
     text: `Listen to ${props.track.title} by ${props.track.artists?.map(a => a.name).join(', ') || props.track.artist_name} on ${api.config.playerName}`,
-    url: window.location.origin + window.location.pathname + `#/album/${props.track.album_id || ''}` // Best fallback for now
+    url: window.location.origin + window.location.pathname + `#/album/${props.track.album_id || ''}`
   }
   
   try {
@@ -167,6 +193,7 @@ async function handleShare() {
 }
 
 async function handleDownload() {
+  showDropdown.value = false
   if (!props.track.audio_url) return
   
   try {
@@ -177,7 +204,6 @@ async function handleDownload() {
     const a = document.createElement('a')
     a.style.display = 'none'
     a.href = url
-    // Sanitize filename: remove characters not allowed in filenames
     const safeTitle = props.track.title.replace(/[<>:"/\\|?*]/g, '')
     const artistNames = props.track.artists?.map(a => a.name).join(', ') || props.track.artist_name
     const safeArtist = artistNames.replace(/[<>:"/\\|?*]/g, '')
@@ -192,7 +218,6 @@ async function handleDownload() {
     }, 100)
   } catch (e) {
     console.error('Download failed:', e)
-    // Fallback: open in new window
     window.open(props.track.audio_url, '_blank')
   }
 }
@@ -371,13 +396,59 @@ function formatStreams(n) {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 4px;
+  gap: 12px;
   opacity: 0.4;
   transition: opacity 0.15s;
 }
 
-.track-row:hover .col-actions {
+.track-row:hover .col-actions, .col-actions:focus-within {
   opacity: 1;
+}
+
+.more-menu-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 1000;
+  background: #282828;
+  min-width: 180px;
+  padding: 4px;
+  border-radius: 4px;
+  box-shadow: 0 16px 24px rgba(0,0,0,0.5);
+  margin-top: 8px;
+}
+
+.dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: none;
+  border: none;
+  color: #eaeaea;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background 0.1s;
+}
+
+.dropdown-item:hover {
+  background: #3e3e3e;
+  color: #fff;
+}
+
+.dropdown-item .material-symbols-outlined {
+  font-size: 20px;
+  color: #b3b3b3;
 }
 
 .action-btn {
@@ -394,21 +465,16 @@ function formatStreams(n) {
 }
 
 .action-btn .material-symbols-outlined {
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .action-btn:hover {
   color: #fff;
-  transform: scale(1.1);
 }
 
 .like-btn.liked {
   color: #FF0000;
   font-variation-settings: 'FILL' 1;
-}
-
-.track-row:hover .action-btn {
-  opacity: 1;
 }
 
 .sub-link {

@@ -21,6 +21,9 @@
           <span class="material-symbols-outlined filled">play_arrow</span>
         </button>
         <div class="social-links">
+          <a v-if="donationLink" :href="donationLink" target="_blank" class="social-btn gift-btn" title="Send a Gift">
+            <span class="material-symbols-outlined">redeem</span> Gift the Artist
+          </a>
           <a v-if="artist.spotify_url" :href="artist.spotify_url" target="_blank" class="social-btn" title="Spotify">
             <span class="material-symbols-outlined">open_in_new</span> Spotify
           </a>
@@ -96,6 +99,8 @@ const route = useRoute()
 const player = usePlayerStore()
 const artist = ref(null)
 const loading = ref(true)
+
+const donationLink = api.config.donationLink || ''
 
 const heroBg = computed(() =>
   artist.value?.image
@@ -235,6 +240,18 @@ watch(() => route.params.id, load)
 }
 .social-btn:hover { color: #fff; border-color: #fff; }
 .social-btn .material-symbols-outlined { font-size: 14px; }
+
+.gift-btn {
+  background: linear-gradient(135deg, #FF0000 0%, #cc0000 100%);
+  color: #fff !important;
+  border: none !important;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.2);
+}
+.gift-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 0, 0, 0.4);
+}
 
 .bio {
   color: #aaa;

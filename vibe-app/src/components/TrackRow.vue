@@ -8,7 +8,7 @@
     @mouseleave="hovering = false"
   >
     <!-- Number / Play indicator -->
-    <div class="col-num">
+    <div class="col-num" v-if="!hideNumber">
       <span v-if="!hovering && !isCurrentTrack" class="track-num"></span>
       <button v-else class="play-icon-btn" @click="play">
         <span class="material-symbols-outlined filled">{{ isCurrentTrack && player.isPlaying ? 'pause' : 'play_arrow' }}</span>
@@ -20,7 +20,17 @@
 
     <!-- Cover + Title -->
     <div class="col-title">
-      <img v-if="showCover" :src="track.cover || ''" class="mini-cover" @error="$event.target.style.display='none'" />
+      <div class="cover-container" v-if="showCover">
+        <img :src="track.cover || ''" class="mini-cover" @error="$event.target.style.display='none'" />
+        <div class="cover-overlay" v-if="hideNumber && (hovering || isCurrentTrack)">
+          <button class="play-icon-btn overlay-play" @click="play">
+            <span class="material-symbols-outlined filled">{{ isCurrentTrack && player.isPlaying ? 'pause' : 'play_arrow' }}</span>
+          </button>
+        </div>
+        <span v-if="hideNumber && isCurrentTrack && !hovering" class="playing-indicator overlay-indicator">
+          <span class="bar" v-for="i in 3" :key="i"></span>
+        </span>
+      </div>
       <div class="title-meta">
         <p class="title" :class="{ 'text-red': isCurrentTrack }">{{ track.title }}</p>
         <p class="subtitle">
@@ -98,6 +108,7 @@ const props = defineProps({
   queue: { type: Array, default: null },
   showCover: { type: Boolean, default: false },
   showAlbum: { type: Boolean, default: true },
+  hideNumber: { type: Boolean, default: false },
 })
 
 const player = usePlayerStore()
@@ -111,7 +122,10 @@ const active = computed(() => isCurrentTrack.value)
 
 const gridStyle = computed(() => {
   const isMobile = window.innerWidth < 768
-  let cols = ['48px', '1fr'] // Num, Title
+  let cols = []
+  
+  if (!props.hideNumber) cols.push('48px')
+  cols.push('1fr') // Title
   
   if (isMobile) {
     cols.push('110px') // Actions
@@ -279,11 +293,38 @@ function formatStreams(n) {
 
 .title {
   font-size: 13px;
-  font-weight: 500;
-  color: #e5e2e1;
+  font-weight: 600;
+  color: #fff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.cover-container {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.cover-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay-play { color: #fff; }
+.overlay-play .material-symbols-outlined { font-size: 24px; }
+
+.overlay-indicator {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
 }
 
 .text-red { color: #FF0000 !important; }

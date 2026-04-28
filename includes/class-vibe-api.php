@@ -169,10 +169,21 @@ class Vibe_API {
             'post_type'   => 'vibe_track',
             'numberposts' => 10,
             'meta_query'  => [ [ 'key' => '_vibe_track_artist', 'value' => $id ] ],
-            'meta_key'    => '_vibe_stream_count',
             'orderby'     => 'meta_value_num',
+            'meta_key'    => '_vibe_stream_count',
             'order'       => 'DESC',
         ] );
+        
+        // If no tracks found with stream count, try fetching without meta_key requirement
+        if ( empty( $tracks ) ) {
+            $tracks = get_posts( [
+                'post_type'   => 'vibe_track',
+                'numberposts' => 10,
+                'meta_query'  => [ [ 'key' => '_vibe_track_artist', 'value' => $id ] ],
+                'orderby'     => 'date',
+                'order'       => 'DESC',
+            ] );
+        }
         $artist['top_tracks'] = $this->format_tracks( $tracks );
 
         return rest_ensure_response( $artist );
@@ -217,6 +228,17 @@ class Vibe_API {
             'meta_key'    => '_vibe_track_number',
             'order'       => 'ASC',
         ] );
+
+        // If no tracks found with track number, try fetching without meta_key requirement
+        if ( empty( $tracks ) ) {
+            $tracks = get_posts( [
+                'post_type'   => 'vibe_track',
+                'numberposts' => -1,
+                'meta_query'  => [ [ 'key' => '_vibe_track_album', 'value' => $id ] ],
+                'orderby'     => 'title',
+                'order'       => 'ASC',
+            ] );
+        }
         $album['tracks'] = $this->format_tracks( $tracks );
 
         return rest_ensure_response( $album );

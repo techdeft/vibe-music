@@ -6,7 +6,7 @@
       <div class="header-content">
         <div class="album-cover-wrap">
           <img :src="album.cover || ''" :alt="album.title" class="album-cover"
-            @error="$event.target.src = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1 1%22><rect fill=%22%221A1A1A%22 width=%221%22 height=%221%22/></svg>'" />
+            @error="$event.target.src = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1 1%22><rect fill=%22%231A1A1A%22 width=%221%22 height=%221%22/></svg>'" />
         </div>
         <div class="album-info">
           <p class="type-badge">Album</p>

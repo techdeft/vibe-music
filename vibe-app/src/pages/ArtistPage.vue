@@ -39,8 +39,7 @@
       <!-- Top Tracks -->
       <section v-if="artist.top_tracks?.length" class="section">
         <h2 class="section-title">Popular</h2>
-        <div class="tracks-header-row">
-          <span class="th th-num"></span>
+        <div class="tracks-header-row popular-header">
           <span class="th">Title</span>
           <span class="th mobile-hide">Album</span>
           <span class="th th-streams mobile-hide">Plays</span>
@@ -55,6 +54,7 @@
           :number="i + 1"
           :queue="artist.top_tracks"
           show-cover
+          hide-number
         />
       </section>
 
@@ -276,6 +276,10 @@ watch(() => route.params.id, load)
   grid-template-columns: 48px 1fr 1fr 100px 60px 110px;
   padding: 0 16px;
   margin-bottom: 6px;
+}
+
+.popular-header {
+  grid-template-columns: 1fr 1fr 100px 60px 110px;
 }
 
 .th { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #666; }

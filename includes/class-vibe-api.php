@@ -164,17 +164,17 @@ class Vibe_API {
         ] );
         $artist['albums'] = $this->format_albums( $albums );
 
-        // Fetch top tracks
+        // Fetch top tracks - use more direct query for reliability
         $tracks = get_posts( [
             'post_type'   => 'vibe_track',
             'numberposts' => 10,
-            'meta_query'  => [ [ 'key' => '_vibe_track_artist', 'value' => $id ] ],
+            'meta_key'    => '_vibe_track_artist',
+            'meta_value'  => $id,
             'orderby'     => 'meta_value_num',
-            'meta_key'    => '_vibe_stream_count',
             'order'       => 'DESC',
         ] );
         
-        // If no tracks found with stream count, try fetching without meta_key requirement
+        // If still no tracks, fallback to broader query
         if ( empty( $tracks ) ) {
             $tracks = get_posts( [
                 'post_type'   => 'vibe_track',
@@ -219,26 +219,23 @@ class Vibe_API {
 
         $album = $this->format_album( $post );
 
-        // Fetch tracks for this album
+        // Fetch tracks for this album - use direct meta query
         $tracks = get_posts( [
             'post_type'   => 'vibe_track',
             'numberposts' => -1,
-            'meta_query'  => [ [ 'key' => '_vibe_track_album', 'value' => $id ] ],
-            'orderby'     => 'meta_value_num',
-            'meta_key'    => '_vibe_track_number',
-            'order'       => 'ASC',
+            'meta_key'    => '_vibe_track_album',
+            'meta_value'  => $id,
+            'post_status' => 'publish',
         ] );
 
-        // If no tracks found with track number, try fetching without meta_key requirement
-        if ( empty( $tracks ) ) {
-            $tracks = get_posts( [
-                'post_type'   => 'vibe_track',
-                'numberposts' => -1,
-                'meta_query'  => [ [ 'key' => '_vibe_track_album', 'value' => $id ] ],
-                'orderby'     => 'title',
-                'order'       => 'ASC',
-            ] );
-        }
+        // Sort by track number in PHP
+        usort( $tracks, function( $a, $b ) {
+            $num_a = (int) get_post_meta( $a->ID, '_vibe_track_number', true ) ?: 999;
+            $num_b = (int) get_post_meta( $b->ID, '_vibe_track_number', true ) ?: 999;
+            if ( $num_a === $num_b ) return strcmp( $a->post_title, $b->post_title );
+            return $num_a <=> $num_b;
+        } );
+
         $album['tracks'] = $this->format_tracks( $tracks );
 
         return rest_ensure_response( $album );

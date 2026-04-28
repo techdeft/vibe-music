@@ -14,8 +14,11 @@ class Vibe_Admin {
         add_action( 'admin_post_vibe_save_genre', [ $this, 'save_genre' ] );
         add_action( 'admin_post_vibe_delete_genre', [ $this, 'delete_genre' ] );
         add_action( 'admin_post_vibe_save_artist', [ $this, 'save_artist' ] );
+        add_action( 'admin_post_vibe_delete_artist', [ $this, 'delete_artist' ] );
         add_action( 'admin_post_vibe_save_album', [ $this, 'save_album' ] );
+        add_action( 'admin_post_vibe_delete_album', [ $this, 'delete_album' ] );
         add_action( 'admin_post_vibe_save_track', [ $this, 'save_track' ] );
+        add_action( 'admin_post_vibe_delete_track', [ $this, 'delete_track' ] );
     }
 
     // -------------------------------------------------------------------------
@@ -199,6 +202,9 @@ class Vibe_Admin {
                 <?php if ( isset( $_GET['saved'] ) ) : ?>
                     <div class="notice notice-success is-dismissible" style="margin-bottom: 40px;"><p>✅ Change saved successfully to the database.</p></div>
                 <?php endif; ?>
+                <?php if ( isset( $_GET['deleted'] ) ) : ?>
+                    <div class="notice notice-success is-dismissible" style="margin-bottom: 40px;"><p>🗑️ Item deleted successfully.</p></div>
+                <?php endif; ?>
 
                 <div class="vibe-studio-content">
                     <?php
@@ -299,7 +305,15 @@ class Vibe_Admin {
                             <td width="50"><img src="<?php echo $img ?: 'https://via.placeholder.com/40'; ?>" width="40" height="40" style="border-radius:4px;object-fit:cover;" /></td>
                             <td><strong><?php echo esc_html( $artist->post_title ); ?></strong></td>
                             <td><?php echo number_format( $listeners ?: 0 ); ?></td>
-                            <td><a href="?page=vibe-studio&tab=artists&edit=<?php echo $artist->ID; ?>" class="vibe-action-link">Edit</a></td>
+                            <td>
+                                <a href="?page=vibe-studio&tab=artists&edit=<?php echo $artist->ID; ?>" class="vibe-action-link">Edit</a>
+                                <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline; margin-left:10px;">
+                                    <?php wp_nonce_field( 'vibe_delete_artist_' . $artist->ID, 'vibe_delete_nonce' ); ?>
+                                    <input type="hidden" name="action" value="vibe_delete_artist" />
+                                    <input type="hidden" name="artist_id" value="<?php echo $artist->ID; ?>" />
+                                    <button type="submit" class="vibe-action-link vibe-action-link--danger" onclick="return confirm('Delete this artist? All their songs and albums will remain but be unlinked.')" style="background:none; border:none; padding:0; cursor:pointer;">Delete</button>
+                                </form>
+                            </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -381,7 +395,15 @@ class Vibe_Admin {
                             <td width="50"><img src="<?php echo $img ?: 'https://via.placeholder.com/40'; ?>" width="40" height="40" style="border-radius:4px;object-fit:cover;" /></td>
                             <td><strong><?php echo esc_html( $album->post_title ); ?></strong></td>
                             <td><?php echo esc_html( $artist_name ); ?></td>
-                            <td><a href="?page=vibe-studio&tab=albums&edit=<?php echo $album->ID; ?>" class="vibe-action-link">Edit</a></td>
+                            <td>
+                                <a href="?page=vibe-studio&tab=albums&edit=<?php echo $album->ID; ?>" class="vibe-action-link">Edit</a>
+                                <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline; margin-left:10px;">
+                                    <?php wp_nonce_field( 'vibe_delete_album_' . $album->ID, 'vibe_delete_nonce' ); ?>
+                                    <input type="hidden" name="action" value="vibe_delete_album" />
+                                    <input type="hidden" name="album_id" value="<?php echo $album->ID; ?>" />
+                                    <button type="submit" class="vibe-action-link vibe-action-link--danger" onclick="return confirm('Delete this album? The tracks will remain but be unlinked.')" style="background:none; border:none; padding:0; cursor:pointer;">Delete</button>
+                                </form>
+                            </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -534,7 +556,15 @@ class Vibe_Admin {
                             </td>
                             <td><?php echo $album_id ? esc_html( get_the_title( $album_id ) ) : '—'; ?></td>
                             <td><span class="vibe-badge"><?php echo number_format( $streams ); ?></span></td>
-                            <td><a href="?page=vibe-studio&tab=tracks&edit=<?php echo $track->ID; ?>" class="vibe-action-link">Edit</a></td>
+                            <td>
+                                <a href="?page=vibe-studio&tab=tracks&edit=<?php echo $track->ID; ?>" class="vibe-action-link">Edit</a>
+                                <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline; margin-left:10px;">
+                                    <?php wp_nonce_field( 'vibe_delete_track_' . $track->ID, 'vibe_delete_nonce' ); ?>
+                                    <input type="hidden" name="action" value="vibe_delete_track" />
+                                    <input type="hidden" name="track_id" value="<?php echo $track->ID; ?>" />
+                                    <button type="submit" class="vibe-action-link vibe-action-link--danger" onclick="return confirm('Delete this track?')" style="background:none; border:none; padding:0; cursor:pointer;">Delete</button>
+                                </form>
+                            </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -874,6 +904,36 @@ class Vibe_Admin {
         }
 
         wp_redirect( admin_url( 'admin.php?page=vibe-studio&tab=tracks&saved=1' ) );
+        exit;
+    }
+
+    public function delete_artist() {
+        $id = absint( $_POST['artist_id'] ?? 0 );
+        if ( ! current_user_can( 'manage_options' ) || ! wp_verify_nonce( $_POST['vibe_delete_nonce'], 'vibe_delete_artist_' . $id ) ) {
+            wp_die( 'Unauthorized' );
+        }
+        wp_delete_post( $id, true );
+        wp_redirect( admin_url( 'admin.php?page=vibe-studio&tab=artists&deleted=1' ) );
+        exit;
+    }
+
+    public function delete_album() {
+        $id = absint( $_POST['album_id'] ?? 0 );
+        if ( ! current_user_can( 'manage_options' ) || ! wp_verify_nonce( $_POST['vibe_delete_nonce'], 'vibe_delete_album_' . $id ) ) {
+            wp_die( 'Unauthorized' );
+        }
+        wp_delete_post( $id, true );
+        wp_redirect( admin_url( 'admin.php?page=vibe-studio&tab=albums&deleted=1' ) );
+        exit;
+    }
+
+    public function delete_track() {
+        $id = absint( $_POST['track_id'] ?? 0 );
+        if ( ! current_user_can( 'manage_options' ) || ! wp_verify_nonce( $_POST['vibe_delete_nonce'], 'vibe_delete_track_' . $id ) ) {
+            wp_die( 'Unauthorized' );
+        }
+        wp_delete_post( $id, true );
+        wp_redirect( admin_url( 'admin.php?page=vibe-studio&tab=tracks&deleted=1' ) );
         exit;
     }
 

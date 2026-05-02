@@ -39,6 +39,8 @@ const routes = [
       { path: 'library', name: 'library', component: () => import('@/pages/LibraryPage.vue') },
       { path: 'playlist/:id', name: 'playlist', component: () => import('@/pages/PlaylistPage.vue') },
       { path: 'liked-songs', name: 'liked-songs', component: () => import('@/pages/LikedSongsPage.vue') },
+      { path: 'videos', name: 'videos', component: () => import('@/pages/VideosPage.vue') },
+      { path: 'video/:id', name: 'video', component: () => import('@/pages/VideoSinglePage.vue') },
     ]
   }
 ]

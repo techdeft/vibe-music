@@ -19,6 +19,8 @@ class Vibe_Admin {
         add_action( 'admin_post_vibe_delete_album', [ $this, 'delete_album' ] );
         add_action( 'admin_post_vibe_save_track', [ $this, 'save_track' ] );
         add_action( 'admin_post_vibe_delete_track', [ $this, 'delete_track' ] );
+        add_action( 'admin_post_vibe_save_video', [ $this, 'save_video' ] );
+        add_action( 'admin_post_vibe_delete_video', [ $this, 'delete_video' ] );
     }
 
     // -------------------------------------------------------------------------
@@ -65,7 +67,7 @@ class Vibe_Admin {
         ];
         $cpt_hooks  = [ 'post.php', 'post-new.php' ];
 
-        if ( in_array( $hook, $vibe_hooks ) || ( in_array( $hook, $cpt_hooks ) && in_array( get_post_type(), [ 'vibe_artist', 'vibe_album', 'vibe_track' ] ) ) ) {
+        if ( in_array( $hook, $vibe_hooks ) || ( in_array( $hook, $cpt_hooks ) && in_array( get_post_type(), [ 'vibe_artist', 'vibe_album', 'vibe_track', 'vibe_video' ] ) ) ) {
             wp_enqueue_media();
             wp_enqueue_style( 'vibe-admin', VIBE_PLUGIN_URL . 'assets/css/admin.css', [], VIBE_VERSION );
         }
@@ -174,6 +176,7 @@ class Vibe_Admin {
             'artists' => [ 'label' => 'Artists', 'icon' => 'dashicons-microphone', 'desc' => 'Manage your music creators and their profiles.' ],
             'albums'  => [ 'label' => 'Albums',  'icon' => 'dashicons-album', 'desc' => 'Group tracks into professional albums and EPs.' ],
             'tracks'  => [ 'label' => 'Tracks',  'icon' => 'dashicons-format-audio', 'desc' => 'Upload and manage your high-quality audio files.' ],
+            'videos'  => [ 'label' => 'Videos',  'icon' => 'dashicons-video-alt3', 'desc' => 'Upload and manage exclusive music videos.' ],
         ];
         ?>
         <div class="vibe-admin-wrap">
@@ -212,6 +215,7 @@ class Vibe_Admin {
                         case 'artists': $this->render_studio_artists( $edit_post ); break;
                         case 'albums':  $this->render_studio_albums( $edit_post ); break;
                         case 'tracks':  $this->render_studio_tracks( $edit_post ); break;
+                        case 'videos':  $this->render_studio_videos( $edit_post ); break;
                     }
                     ?>
                 </div>
@@ -563,6 +567,99 @@ class Vibe_Admin {
                                     <input type="hidden" name="action" value="vibe_delete_track" />
                                     <input type="hidden" name="track_id" value="<?php echo $track->ID; ?>" />
                                     <button type="submit" class="vibe-action-link vibe-action-link--danger" onclick="return confirm('Delete this track?')" style="background:none; border:none; padding:0; cursor:pointer;">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <?php
+    }
+
+    private function render_studio_videos( $edit_post = null ) {
+        $videos  = get_posts( [ 'post_type' => 'vibe_video', 'numberposts' => 15, 'orderby' => 'date', 'order' => 'DESC' ] );
+        $is_edit = $edit_post && $edit_post->post_type === 'vibe_video';
+
+        $video_url = $is_edit ? get_post_meta( $edit_post->ID, '_vibe_video_url', true ) : '';
+        $duration  = $is_edit ? get_post_meta( $edit_post->ID, '_vibe_video_duration', true ) : '';
+        $featured  = $is_edit ? get_post_meta( $edit_post->ID, '_vibe_video_featured', true ) : '0';
+        $image_id  = $is_edit ? get_post_thumbnail_id( $edit_post->ID ) : '';
+        $image_url = $image_id ? wp_get_attachment_image_url( $image_id, 'thumbnail' ) : '';
+        ?>
+        <div class="vibe-two-col">
+            <div class="vibe-card">
+                <h2><?php echo $is_edit ? 'Edit Video' : 'Add New Video'; ?></h2>
+                <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+                    <?php wp_nonce_field( 'vibe_save_video', 'vibe_video_nonce' ); ?>
+                    <input type="hidden" name="action" value="vibe_save_video" />
+                    <?php if ( $is_edit ) : ?><input type="hidden" name="video_id" value="<?php echo $edit_post->ID; ?>" /><?php endif; ?>
+
+                    <div class="vibe-form-group">
+                        <label>Video Title</label>
+                        <input type="text" name="video_title" required class="large-text" placeholder="e.g. Blinding Lights (Official Music Video)" value="<?php echo $is_edit ? esc_attr( $edit_post->post_title ) : ''; ?>" />
+                    </div>
+                    <div class="vibe-form-group">
+                        <label>Video URL (YouTube or File)</label>
+                        <div class="vibe-media-uploader">
+                            <div class="vibe-media-preview" id="video_file_preview"><span class="dashicons dashicons-video-alt3" style="font-size:30px;color:#ccc;"></span></div>
+                            <div class="vibe-media-actions" style="flex:1;">
+                                <input type="text" name="video_url" id="video_file_url" class="large-text" placeholder="YouTube URL or select video file" required style="margin-bottom:10px;" value="<?php echo esc_attr( $video_url ); ?>" />
+                                <button type="button" class="vibe-btn vibe-btn-outline" onclick="vibeSelectMedia('Select Video File', 'video', function(a){ 
+                                    document.getElementById('video_file_url').value = a.url;
+                                })">Choose Video</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="vibe-form-group">
+                        <label>Video Thumbnail (Required for YouTube)</label>
+                        <div class="vibe-media-uploader">
+                            <div class="vibe-media-preview" id="video_image_preview">
+                                <?php if ( $image_url ) : ?><img src="<?php echo $image_url; ?>" style="width:100%;height:100%;object-fit:cover;" /><?php endif; ?>
+                            </div>
+                            <div class="vibe-media-actions">
+                                <input type="hidden" name="video_image_id" id="video_image_id" value="<?php echo $image_id; ?>" />
+                                <button type="button" class="vibe-btn vibe-btn-outline" onclick="vibeSelectMedia('Select Video Thumbnail', 'image', function(a){ 
+                                    document.getElementById('video_image_id').value = a.id;
+                                    document.getElementById('video_image_preview').innerHTML = '<img src=\''+a.url+'\' style=\'width:100%;height:100%;object-fit:cover;\' />';
+                                })">Choose Thumbnail</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="vibe-form-group">
+                        <label>Duration (mm:ss)</label>
+                        <input type="text" name="video_duration" class="large-text" placeholder="e.g. 3:24" value="<?php echo esc_attr( $duration ); ?>" />
+                    </div>
+                    <div class="vibe-form-group">
+                        <label>Description</label>
+                        <textarea name="video_description" rows="5" class="large-text" placeholder="About this video..."><?php echo $is_edit ? esc_textarea( $edit_post->post_content ) : ''; ?></textarea>
+                    </div>
+                    <div class="vibe-form-group">
+                        <label><input type="checkbox" name="video_featured" value="1" <?php checked( $featured, '1' ); ?> /> <strong>Featured Video</strong> (Show on Discovery)</label>
+                    </div>
+                    <button type="submit" class="vibe-btn vibe-btn-primary"><?php echo $is_edit ? 'Update Video' : 'Create Video'; ?></button>
+                    <?php if ( $is_edit ) : ?><a href="?page=vibe-studio&tab=videos" class="vibe-btn vibe-btn-outline" style="margin-left:10px;">Cancel</a><?php endif; ?>
+                </form>
+            </div>
+            <div class="vibe-card">
+                <h2>Recent Videos</h2>
+                <table class="vibe-table">
+                    <thead><tr><th>Thumbnail</th><th>Title</th><th>Actions</th></tr></thead>
+                    <tbody>
+                        <?php foreach ( $videos as $video ) : 
+                            $img = get_the_post_thumbnail_url( $video->ID, 'thumbnail' );
+                        ?>
+                        <tr>
+                            <td width="80"><img src="<?php echo $img ?: 'https://via.placeholder.com/80x45'; ?>" width="80" height="45" style="border-radius:4px;object-fit:cover;" /></td>
+                            <td><strong><?php echo esc_html( $video->post_title ); ?></strong></td>
+                            <td>
+                                <a href="?page=vibe-studio&tab=videos&edit=<?php echo $video->ID; ?>" class="vibe-action-link">Edit</a>
+                                <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline; margin-left:10px;">
+                                    <?php wp_nonce_field( 'vibe_delete_video_' . $video->ID, 'vibe_delete_nonce' ); ?>
+                                    <input type="hidden" name="action" value="vibe_delete_video" />
+                                    <input type="hidden" name="video_id" value="<?php echo $video->ID; ?>" />
+                                    <button type="submit" class="vibe-action-link vibe-action-link--danger" onclick="return confirm('Delete this video?')" style="background:none; border:none; padding:0; cursor:pointer;">Delete</button>
                                 </form>
                             </td>
                         </tr>
@@ -934,6 +1031,53 @@ class Vibe_Admin {
         }
         wp_delete_post( $id, true );
         wp_redirect( admin_url( 'admin.php?page=vibe-studio&tab=tracks&deleted=1' ) );
+        exit;
+    }
+
+    public function save_video() {
+        if ( ! current_user_can( 'manage_options' ) || ! wp_verify_nonce( $_POST['vibe_video_nonce'], 'vibe_save_video' ) ) wp_die( 'Unauthorized' );
+        
+        $video_id = absint( $_POST['video_id'] ?? 0 );
+        $title    = sanitize_text_field( $_POST['video_title'] );
+        $content  = wp_kses_post( $_POST['video_description'] ?? '' );
+        
+        $args = [
+            'post_type'    => 'vibe_video',
+            'post_title'   => $title,
+            'post_content' => $content,
+            'post_status'  => 'publish',
+        ];
+
+        if ( $video_id ) {
+            $args['ID'] = $video_id;
+            wp_update_post( $args );
+        } else {
+            $video_id = wp_insert_post( $args );
+        }
+
+        if ( $video_id ) {
+            update_post_meta( $video_id, '_vibe_video_url', esc_url_raw( $_POST['video_url'] ?? '' ) );
+            update_post_meta( $video_id, '_vibe_video_duration', sanitize_text_field( $_POST['video_duration'] ?? '' ) );
+            update_post_meta( $video_id, '_vibe_video_featured', isset( $_POST['video_featured'] ) ? '1' : '0' );
+            
+            if ( ! empty( $_POST['video_image_id'] ) ) {
+                set_post_thumbnail( $video_id, absint( $_POST['video_image_id'] ) );
+            } else {
+                delete_post_thumbnail( $video_id );
+            }
+        }
+
+        wp_redirect( admin_url( 'admin.php?page=vibe-studio&tab=videos&saved=1' ) );
+        exit;
+    }
+
+    public function delete_video() {
+        $id = absint( $_POST['video_id'] ?? 0 );
+        if ( ! current_user_can( 'manage_options' ) || ! wp_verify_nonce( $_POST['vibe_delete_nonce'], 'vibe_delete_video_' . $id ) ) {
+            wp_die( 'Unauthorized' );
+        }
+        wp_delete_post( $id, true );
+        wp_redirect( admin_url( 'admin.php?page=vibe-studio&tab=videos&deleted=1' ) );
         exit;
     }
 

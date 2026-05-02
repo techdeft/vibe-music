@@ -8,6 +8,10 @@
       <span class="material-symbols-outlined">search</span>
       <span>Search</span>
     </RouterLink>
+    <RouterLink to="/videos" class="nav-item" :class="{ active: $route.name === 'videos' || $route.name === 'video' }">
+      <span class="material-symbols-outlined">smart_display</span>
+      <span>Videos</span>
+    </RouterLink>
     <RouterLink to="/library" class="nav-item" :class="{ active: $route.name === 'library' }">
       <span class="material-symbols-outlined">library_music</span>
       <span>Library</span>
@@ -39,7 +43,7 @@ const auth = useAuthStore()
   background: rgba(18, 18, 18, 0.95);
   backdrop-filter: blur(20px);
   border-top: 1px solid rgba(255, 255, 255, 0.05);
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   z-index: 1000;
   padding-bottom: env(safe-area-inset-bottom);
 }

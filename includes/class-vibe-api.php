@@ -58,6 +58,21 @@ class Vibe_API {
             'permission_callback' => '__return_true',
         ] );
 
+        // Videos list
+        register_rest_route( self::NAMESPACE, '/videos', [
+            'methods'             => 'GET',
+            'callback'            => [ $this, 'get_videos' ],
+            'permission_callback' => '__return_true',
+        ] );
+
+        // Single Video
+        register_rest_route( self::NAMESPACE, '/video/(?P<id>\d+)', [
+            'methods'             => 'GET',
+            'callback'            => [ $this, 'get_video' ],
+            'permission_callback' => '__return_true',
+            'args'                => [ 'id' => [ 'validate_callback' => fn( $p ) => is_numeric( $p ) ] ],
+        ] );
+
         // Search
         register_rest_route( self::NAMESPACE, '/search', [
             'methods'             => 'GET',
@@ -254,6 +269,30 @@ class Vibe_API {
         ] ) ) );
     }
 
+    public function get_videos( $request ) {
+        $page     = max( 1, intval( $request->get_param( 'page' ) ?? 1 ) );
+        $per_page = min( 100, intval( $request->get_param( 'per_page' ) ?? 30 ) );
+
+        return rest_ensure_response( $this->format_videos( get_posts( [
+            'post_type'   => 'vibe_video',
+            'numberposts' => $per_page,
+            'offset'      => ( $page - 1 ) * $per_page,
+            'orderby'     => 'date',
+            'order'       => 'DESC',
+        ] ) ) );
+    }
+
+    public function get_video( $request ) {
+        $id   = $request['id'];
+        $post = get_post( $id );
+
+        if ( ! $post || $post->post_type !== 'vibe_video' ) {
+            return new WP_Error( 'not_found', 'Video not found', [ 'status' => 404 ] );
+        }
+
+        return rest_ensure_response( $this->format_video( $post ) );
+    }
+
     public function search( $request ) {
         $query = sanitize_text_field( $request->get_param( 'q' ) ?? '' );
 
@@ -392,6 +431,22 @@ class Vibe_API {
             'streams'     => (int) get_post_meta( $post->ID, '_vibe_stream_count', true ),
             'likes'       => (int) get_post_meta( $post->ID, '_vibe_likes_count', true ),
             'liked'       => $is_liked,
+        ];
+    }
+
+    private function format_videos( $posts ) {
+        return array_map( [ $this, 'format_video' ], $posts );
+    }
+
+    private function format_video( $post ) {
+        return [
+            'id'          => $post->ID,
+            'title'       => $post->post_title,
+            'video_url'   => get_post_meta( $post->ID, '_vibe_video_url', true ) ?: '',
+            'duration'    => get_post_meta( $post->ID, '_vibe_video_duration', true ) ?: '',
+            'cover'       => $this->get_featured_image( $post->ID ) ?: '',
+            'featured'    => get_post_meta( $post->ID, '_vibe_video_featured', true ) === '1',
+            'description' => $post->post_content,
         ];
     }
 

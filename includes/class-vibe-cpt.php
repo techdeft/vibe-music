@@ -53,6 +53,17 @@ class Vibe_CPT {
             'menu_icon'         => 'dashicons-format-audio',
         ] );
 
+        // VIDEO
+        register_post_type( 'vibe_video', [
+            'labels'            => $this->get_labels( 'Video', 'Videos' ),
+            'public'            => false,
+            'show_ui'           => true,
+            'show_in_menu'      => false,
+            'supports'          => [ 'title', 'editor', 'thumbnail' ],
+            'show_in_rest'      => true,
+            'menu_icon'         => 'dashicons-video-alt3',
+        ] );
+
         // PLAYLIST (user-created, managed via REST API)
         register_post_type( 'vibe_playlist', [
             'labels'       => $this->get_labels( 'Playlist', 'Playlists' ),

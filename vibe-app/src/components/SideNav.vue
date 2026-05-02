@@ -16,6 +16,10 @@
         <span class="material-symbols-outlined">search</span>
         <span>Search</span>
       </RouterLink>
+      <RouterLink to="/videos" class="nav-item" :class="{ active: $route.name === 'videos' || $route.name === 'video' }">
+        <span class="material-symbols-outlined">smart_display</span>
+        <span>Videos</span>
+      </RouterLink>
       <RouterLink to="/library" class="nav-item" :class="{ active: $route.name === 'library' }">
         <span class="material-symbols-outlined">library_music</span>
         <span>Your Library</span>

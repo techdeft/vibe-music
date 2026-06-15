@@ -137,10 +137,18 @@ const youtubeId = computed(() => {
 
 async function handleShare() {
   if (!player.currentTrack) return
+  
+  let basePath = '#/'
+  if (player.currentTrack.album_id) {
+    basePath = `#/album/${player.currentTrack.album_id}`
+  } else if (player.currentTrack.artist_id) {
+    basePath = `#/artist/${player.currentTrack.artist_id}`
+  }
+
   const shareData = {
     title: player.currentTrack.title,
     text: `Listen to ${player.currentTrack.title} by ${player.currentTrack.artists?.map(a => a.name).join(', ') || player.currentTrack.artist_name} on ${api.config.playerName}`,
-    url: window.location.origin + window.location.pathname + `#/album/${player.currentTrack.album_id || ''}?play=${player.currentTrack.id}`
+    url: window.location.origin + window.location.pathname + `${basePath}?play=${player.currentTrack.id}`
   }
   
   try {

@@ -113,6 +113,14 @@ async function load() {
   artist.value = null
   try {
     artist.value = await api.artist(route.params.id)
+    
+    const playTrackId = route.query.play
+    if (playTrackId && artist.value?.top_tracks) {
+      const trackToPlay = artist.value.top_tracks.find(t => String(t.id) === String(playTrackId))
+      if (trackToPlay) {
+        player.playTrack(trackToPlay, artist.value.top_tracks)
+      }
+    }
   } catch (e) {
     console.error(e)
   } finally {

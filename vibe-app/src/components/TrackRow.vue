@@ -177,7 +177,7 @@ async function handleShare() {
   const shareData = {
     title: props.track.title,
     text: `Listen to ${props.track.title} by ${props.track.artists?.map(a => a.name).join(', ') || props.track.artist_name} on ${api.config.playerName}`,
-    url: window.location.origin + window.location.pathname + `#/album/${props.track.album_id || ''}`
+    url: window.location.origin + window.location.pathname + `#/album/${props.track.album_id || ''}?play=${props.track.id}`
   }
   
   try {

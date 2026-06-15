@@ -140,7 +140,7 @@ async function handleShare() {
   const shareData = {
     title: player.currentTrack.title,
     text: `Listen to ${player.currentTrack.title} by ${player.currentTrack.artists?.map(a => a.name).join(', ') || player.currentTrack.artist_name} on ${api.config.playerName}`,
-    url: window.location.origin + window.location.pathname + `#/album/${player.currentTrack.album_id || ''}`
+    url: window.location.origin + window.location.pathname + `#/album/${player.currentTrack.album_id || ''}?play=${player.currentTrack.id}`
   }
   
   try {
